@@ -1,6 +1,5 @@
 package src.sample;
 
-import java.awt.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,20 +18,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.event.ActionEvent;
 import javafx.scene.image.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.scene.text.*;
 import javafx.scene.control.TextArea;
 
 import javafx.scene.media.MediaPlayer;
-import java.io.File;
 
 
 public class Main extends Application {
@@ -48,7 +43,8 @@ public class Main extends Application {
     private MediaPlayer mp;
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("Fight.fxml"));
+        Parent parentFight = FXMLLoader.load(getClass().getResource("Fight.fxml"));
+        Parent parentVolume = FXMLLoader.load(getClass().getResource("Volume.fxml"));
         txtRules = new TextArea();
         txtRules.setStyle("-fx-control-inner-background:blue; -fx-opacity: transparent");
         txtRules.setDisable(true);
@@ -65,7 +61,8 @@ public class Main extends Application {
 
         Scene optionsScene = new Scene(optionsMenu);
         Scene menuScene = new Scene(mainMenu);
-        Scene playScene = new Scene(root, 603, 400);
+        Scene playScene = new Scene(parentFight, 603, 400);
+        Scene volumeScene = new Scene(parentVolume, 603, 400);
 
         try {
             AudioClip audo = new AudioClip(getClass().getResource("music.mp3").toURI().toString());
@@ -118,6 +115,7 @@ public class Main extends Application {
         mainMenu.getChildren().addAll(menuBox);
         optionsMenu.getChildren().addAll(optionsBox, goBack);
 
+
         Exit.setOnMouseClicked(e -> {
             System.exit(0);
         });
@@ -133,7 +131,7 @@ public class Main extends Application {
 
         Play.setOnMouseClicked(e -> {
             primaryStage.setScene(playScene);
-           // Server();
+            //Server();
         });
 
         Help.setOnMouseClicked(e -> {
@@ -144,12 +142,8 @@ public class Main extends Application {
         });
 
 
-
         Volume.setOnMouseClicked(e -> {
-            txtRules.setVisible(true);
-            optionsMenu.getChildren().add(txtRules);
-            txtRules.setTranslateX(10);
-            txtRules.setTranslateY(200);
+            primaryStage.setScene(volumeScene);
         });
 
         primaryStage.setTitle("DragonBall Ghetto");
@@ -179,22 +173,25 @@ public class Main extends Application {
         }
     }
 
-    /*
+
+
     public void client() throws IOException {
         if (send = Boolean.TRUE) {
-            Socket socket = new Socket("10.160.36.80", 8080);
+            Socket socket = new Socket("192.168.1.172", 8195);
             PrintWriter out = new PrintWriter(socket.getOutputStream());
             String request = temp;
-            out.print(request);
+            out.print(temp);
             out.flush();
+            System.out.println("hello");
+            socket.close();
             txtChatBox.setWrapText(true); //wraps to next line if message is too long
             txtChatBox.appendText(request + "\n"); //appends the message with a next line at the end of it
         }
-    }*/
+    }
 
     public void Server() throws IOException {
-        ServerSocket serverSocket = new ServerSocket(8090);
-        while (true) {
+        ServerSocket serverSocket = new ServerSocket(8095);
+        /*while (true) {
             try {
                 Socket clientSocket = serverSocket.accept();
 
@@ -212,10 +209,9 @@ public class Main extends Application {
                 System.out.println("Client Disconnected");
                 e.printStackTrace();
 
-
             }
             //... input and output goes here ...
-        }
+        }*/
     }
 
 
@@ -224,6 +220,9 @@ public class Main extends Application {
         txtTypeMsg.clear(); //clears message when it has been put into temp
         send = Boolean.TRUE;
         //client();
+    }
+
+    public void backOnClick(ActionEvent actionEvent) {
     }
 
     private static class MenuBox extends VBox {
