@@ -123,6 +123,7 @@ public class Server extends JFrame {
         );
     }
     // letting the other player type
+
     private void ableToType(final boolean tof){
         SwingUtilities.invokeLater(
                 new Runnable(){
