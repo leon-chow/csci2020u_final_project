@@ -8,15 +8,15 @@ import javax.swing.*;
 public class Server extends JFrame {
 
 
-    private TextField userText;
-    private  TextArea chatwindow;
+    private JTextField userText;
+    private  JTextArea chatwindow;
     private ObjectOutputStream output;
     private ObjectInputStream input;
     private ServerSocket server;
     private Socket connection;
     public Server(){
         super("instant messanger");
-        userText = new TextField();
+        userText = new JTextField();
         userText.setEditable(false);
         userText.addActionListener(
                 new ActionListener() {
@@ -27,7 +27,7 @@ public class Server extends JFrame {
                 }
         );
         add(userText,BorderLayout.NORTH);
-        chatwindow = new TextArea();
+        chatwindow = new JTextArea();
         add(new JScrollPane(chatwindow));
         setSize(300,150);
         setVisible(true);

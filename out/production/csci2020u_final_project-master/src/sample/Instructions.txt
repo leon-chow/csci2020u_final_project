@@ -1,0 +1,4 @@
+First, select a character to play as in the character selection menu. When the game starts, you 
+and your opponents will take turns selecting an action to perform. The battle will proceed with everyone performing
+their actions. By utilizing different abilities and attacks, you can deal a significant amount damage to 
+your opponent's Health Points (HP). The last player to not have their health points reduced to 0 will be victorious.

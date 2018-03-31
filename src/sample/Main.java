@@ -56,7 +56,6 @@ public class Main extends Application {
     public static Parent parentVolumeScene;
 
     public static BufferedReader br;
-    public static LineNumberReader lnr;
     File helpFile = new File("src/sample/Instructions.txt");
     File creditsFile = new File("src/sample/Credits.txt");
 
@@ -250,7 +249,6 @@ public class Main extends Application {
 
     public void backOnAction(ActionEvent actionEvent) {
         mainStage.setScene(optionsScene);
-        System.out.println("Heading back");
     }
 
     public void punchOnAction(ActionEvent actionEvent) { //punch button when clicked

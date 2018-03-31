@@ -2,12 +2,14 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
 
 <GridPane maxHeight="400" maxWidth="603" minHeight="400" minWidth="603" prefHeight="400.0" prefWidth="603.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="src.sample.Main">
   <columnConstraints>
@@ -26,7 +28,7 @@
             <Image url="@/res/volume.jpg" />
          </image>
       </ImageView>
-      <Slider fx:id="sliderVolume" prefHeight="16.0" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+      <Slider fx:id="volumeSlider" onDragDetected="#sliderDragDetected" prefHeight="16.0" prefWidth="158.0" value="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
          <padding>
             <Insets left="-50.0" right="-50.0" />
          </padding></Slider>
@@ -35,5 +37,20 @@
             <Insets bottom="50.0" left="30.0" />
          </GridPane.margin>
       </Button>
+      <Label prefHeight="36.0" prefWidth="119.0" text="Volume:" textAlignment="RIGHT" textFill="#00ecff" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Slider fx:id="brightnessSlider" max="0.6" min="-0.6" onMouseDragged="#brightnessMouseDrag" prefHeight="14.0" prefWidth="262.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+         <padding>
+            <Insets left="-50.0" right="-50.0" />
+         </padding>
+      </Slider>
+      <Label text="Brightness:" textAlignment="RIGHT" textFill="#00ecff" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
    </children>
 </GridPane>
