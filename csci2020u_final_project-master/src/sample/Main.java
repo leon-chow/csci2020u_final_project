@@ -1,5 +1,6 @@
 package src.sample;
 
+import java.awt.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,8 +9,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
@@ -18,16 +23,23 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.event.ActionEvent;
 import javafx.scene.image.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.scene.text.*;
 import javafx.scene.control.TextArea;
 
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
+
+import javax.swing.*;
+import java.io.File;
 
 
 public class Main extends Application {
@@ -39,12 +51,16 @@ public class Main extends Application {
     javafx.scene.control.TextField txtTypeMsg = new TextField(); //using the ID of of the messaging field
     @FXML
     TextArea txtChatBox = new TextArea(); //using the ID of the chatbox field
+    @FXML private Slider volumeSlider;
+    @FXML
+
     private TextArea txtRules;
     private MediaPlayer mp;
+    private MediaView mv;
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent parentFight = FXMLLoader.load(getClass().getResource("Fight.fxml"));
-        Parent parentVolume = FXMLLoader.load(getClass().getResource("Volume.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("fight.fxml"));
+        Parent root = (Parent)loader.load();
         txtRules = new TextArea();
         txtRules.setStyle("-fx-control-inner-background:blue; -fx-opacity: transparent");
         txtRules.setDisable(true);
@@ -52,6 +68,12 @@ public class Main extends Application {
                 " attacks,\n you can deal a significant amount of Health Points (HP). The last player who has not have their HP reduced\n to 0" +
                 " will win.");
         primaryStage.setResizable(false); //doesn't let you resize window
+
+
+
+
+
+
 
         Pane mainMenu = new Pane();
         mainMenu.setPrefSize(603, 400);
@@ -61,15 +83,32 @@ public class Main extends Application {
 
         Scene optionsScene = new Scene(optionsMenu);
         Scene menuScene = new Scene(mainMenu);
-        Scene playScene = new Scene(parentFight, 603, 400);
-        Scene volumeScene = new Scene(parentVolume, 603, 400);
+        Scene playScene = new Scene(root, 603, 400);
+
 
         try {
-            AudioClip audo = new AudioClip(getClass().getResource("music.mp3").toURI().toString());
-            audo.play();
+            Media audo = new Media(getClass().getResource("music.mp3").toURI().toString());
+            mp = new MediaPlayer(audo);
+           // mv.setMediaPlayer(mp);
+            mp.play();
+            mp.setRate(1);
+
+
+
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
+
+
+
+
+
+
+
+
+
+
+
 
 
         try (InputStream is = Files.newInputStream(Paths.get("res/dbz.jpg"))) {
@@ -90,6 +129,7 @@ public class Main extends Application {
         } catch (IOException x) {
             System.out.println("Failed");
         }
+
 
         MenuItem Create = new MenuItem("Create New Character");
         MenuItem Play = new MenuItem("Play");
@@ -112,8 +152,10 @@ public class Main extends Application {
         goBack.setTranslateX(10);
         goBack.setTranslateY(10);
 
+
         mainMenu.getChildren().addAll(menuBox);
         optionsMenu.getChildren().addAll(optionsBox, goBack);
+
 
 
         Exit.setOnMouseClicked(e -> {
@@ -131,8 +173,25 @@ public class Main extends Application {
 
         Play.setOnMouseClicked(e -> {
             primaryStage.setScene(playScene);
-            //Server();
+
+
+
+            Thread th = new Thread(() -> {
+                try {
+                    Server test = new Server();
+                    test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    test.startRunning();
+                    sendMessage();
+                } catch (IOException r) {
+                    r.printStackTrace();
+                }
+            });
+            th.setDaemon(true);
+            th.start();
+
+
         });
+
 
         Help.setOnMouseClicked(e -> {
             txtRules.setVisible(true);
@@ -142,8 +201,12 @@ public class Main extends Application {
         });
 
 
+
         Volume.setOnMouseClicked(e -> {
-            primaryStage.setScene(volumeScene);
+            txtRules.setVisible(true);
+            optionsMenu.getChildren().add(txtRules);
+            txtRules.setTranslateX(10);
+            txtRules.setTranslateY(200);
         });
 
         primaryStage.setTitle("DragonBall Ghetto");
@@ -174,25 +237,23 @@ public class Main extends Application {
     }
 
 
-
     public void client() throws IOException {
         if (send = Boolean.TRUE) {
-            Socket socket = new Socket("192.168.1.172", 8195);
+            Socket socket = new Socket("192.168.1.146", 8090);
             PrintWriter out = new PrintWriter(socket.getOutputStream());
             String request = temp;
-            out.print(temp);
+            out.print(request);
             out.flush();
-            System.out.println("hello");
-            socket.close();
             txtChatBox.setWrapText(true); //wraps to next line if message is too long
             txtChatBox.appendText(request + "\n"); //appends the message with a next line at the end of it
         }
     }
 
-    public void Server() throws IOException {
-        ServerSocket serverSocket = new ServerSocket(8095);
-        /*while (true) {
+
+    /*public void Server() throws IOException {
+        while (true) {
             try {
+                ServerSocket serverSocket = new ServerSocket(8195);
                 Socket clientSocket = serverSocket.accept();
 
                 InputStream inStream = clientSocket.getInputStream();
@@ -205,24 +266,22 @@ public class Main extends Application {
                     System.out.println(line);
                 }
 
-            } catch (IOException e) {
+            } catch (IOException e1) {
                 System.out.println("Client Disconnected");
-                e.printStackTrace();
+                e1.printStackTrace();
+
 
             }
             //... input and output goes here ...
-        }*/
-    }
+        }
+    }*/
 
 
     public void sendMessage() throws IOException {
         temp = txtTypeMsg.getText(); //temp is the whatever is in the text field
         txtTypeMsg.clear(); //clears message when it has been put into temp
         send = Boolean.TRUE;
-        //client();
-    }
 
-    public void backOnClick(ActionEvent actionEvent) {
     }
 
     private static class MenuBox extends VBox {
