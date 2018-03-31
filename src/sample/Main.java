@@ -55,10 +55,15 @@ public class Main extends Application {
     public static Parent parentFightScene;
     public static Parent parentVolumeScene;
 
+    public static BufferedReader br;
+    public static LineNumberReader lnr;
+    File helpFile = new File("src/sample/Instructions.txt");
+    File creditsFile = new File("src/sample/Credits.txt");
+
     @FXML javafx.scene.control.TextField txtTypeMsg = new TextField(); //using the ID of of the messaging field
 
     @FXML TextArea txtChatBox = new TextArea(); //using the ID of the chatbox field
-    private TextArea txtRules;
+    public static TextArea txtRules;
 
     @FXML public Slider volumeSlider;
     @FXML public Slider brightnessSlider;
@@ -85,10 +90,8 @@ public class Main extends Application {
 
         txtRules = new TextArea();
         txtRules.setStyle("-fx-control-inner-background:blue; -fx-opacity: transparent");
+        txtRules.setPrefSize(300,300);
         txtRules.setDisable(true);
-        txtRules.setText("How to Play:\n\nYou and other players will take turns to attack. By utilizing different abilities and" +
-                " attacks,\n you can deal a significant amount of Health Points (HP). The last player who has not have their HP reduced\n to 0" +
-                " will win.");
         primaryStage.setResizable(false); //doesn't let you resize window
 
         Media sound = new Media(new File("res/music.mp3").toURI().toString());
@@ -121,11 +124,11 @@ public class Main extends Application {
 
         MenuItem Help = new MenuItem("How to play");
         MenuItem Volume = new MenuItem("Volume and Brightness");
-        MenuItem Effects = new MenuItem("Effects");
+        MenuItem Credits = new MenuItem("Credits");
         MenuItem goBack = new MenuItem("Go Back");
 
         MenuBox menuBox = new MenuBox(Create, Play, Options, Exit);
-        MenuBox optionsBox = new MenuBox(Help, Volume, Effects);
+        MenuBox optionsBox = new MenuBox(Help, Volume, Credits);
         MenuBox volumeBox = new MenuBox(goBack);
 
         menuBox.setTranslateX(350);
@@ -159,21 +162,67 @@ public class Main extends Application {
             //Server();
         });
 
-        Help.setOnMouseClicked(e -> {
-            txtRules.setVisible(true);
-            optionsMenu.getChildren().add(txtRules);
-            txtRules.setTranslateX(10);
-            txtRules.setTranslateY(200);
+        Help.setOnMouseClicked((MouseEvent e) -> {
+            try {
+                txtRules.clear();
+                txtRules.setWrapText(true);
+                br = new BufferedReader(new FileReader(helpFile));
+                String next = null;
+                if (txtRules.getLength() <= 0) {
+                    txtRules.appendText("How to play: \n \n");
+                    while ((next = br.readLine()) != null) {
+                        txtRules.appendText(next);
+                    }
+                }
+
+                txtRules.setVisible(true);
+                optionsMenu.getChildren().add(txtRules);
+
+                txtRules.setTranslateX(10);
+                txtRules.setTranslateY(50);
+                br.close();
+            } catch (FileNotFoundException error) {
+                error.printStackTrace();
+            } catch (IOException error) {
+                error.printStackTrace();
+            }
         });
 
+        Credits.setOnMouseClicked(e -> {
+            try {
+                txtRules.clear();
+                txtRules.setWrapText(true);
+                br = new BufferedReader(new FileReader(creditsFile));
+                String next = "";
+                if (txtRules.getLength() <= 0) {
+                    while ((next = br.readLine()) != null) {
+                        txtRules.appendText(next + "\n");
+                    }
+                }
+
+                txtRules.setVisible(true);
+                optionsMenu.getChildren().add(txtRules);
+
+                txtRules.setTranslateX(10);
+                txtRules.setTranslateY(50);
+                br.close();
+            } catch (FileNotFoundException error) {
+                error.printStackTrace();
+            } catch (IOException error) {
+                error.printStackTrace();
+            }
+        });
 
         Volume.setOnMouseClicked(e -> {
+            txtRules.setVisible(false);
             primaryStage.setScene(volumeScene);
         });
 
         btnGoBack.setOnAction(e -> {
             primaryStage.setScene(optionsScene);
         });
+
+
 
         primaryStage.setTitle("DragonBall Ghetto");
         primaryStage.setScene(menuScene);
@@ -201,6 +250,7 @@ public class Main extends Application {
 
     public void backOnAction(ActionEvent actionEvent) {
         mainStage.setScene(optionsScene);
+        System.out.println("Heading back");
     }
 
     public void punchOnAction(ActionEvent actionEvent) { //punch button when clicked
