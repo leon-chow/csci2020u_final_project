@@ -8,12 +8,18 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.media.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -37,6 +43,7 @@ public class Main extends Application {
     Boolean send;
     public static Stage mainStage;
     String temp;
+    private static MediaPlayer mediaPlayer;
 
     public static Pane mainMenu = new Pane();
 
@@ -45,16 +52,20 @@ public class Main extends Application {
     public static Scene optionsScene = new Scene(optionsMenu);
     public static Scene menuScene = new Scene(mainMenu);
 
-    @FXML
-    javafx.scene.control.TextField txtTypeMsg = new TextField(); //using the ID of of the messaging field
+    public static Parent parentFightScene;
+    public static Parent parentVolumeScene;
 
-    @FXML
-    TextArea txtChatBox = new TextArea(); //using the ID of the chatbox field
+    @FXML javafx.scene.control.TextField txtTypeMsg = new TextField(); //using the ID of of the messaging field
+
+    @FXML TextArea txtChatBox = new TextArea(); //using the ID of the chatbox field
     private TextArea txtRules;
-    private MediaPlayer mp;
 
-    @FXML
-    private Button btnGoBack = new Button();
+    @FXML public Slider volumeSlider;
+    @FXML public Slider brightnessSlider;
+
+    @FXML private Button btnGoBack = new Button();
+
+    public static ColorAdjust colorAdjust = new ColorAdjust();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -65,6 +76,9 @@ public class Main extends Application {
 
         Parent parentFight = FXMLLoader.load(getClass().getResource("Fight.fxml"));
         Parent parentVolume = FXMLLoader.load(getClass().getResource("Volume.fxml"));
+
+        parentFightScene = parentFight;
+        parentVolumeScene = parentVolume;
 
         Scene playScene = new Scene(parentFight, 603, 400);
         Scene volumeScene = new Scene(parentVolume, 603, 400);
@@ -77,13 +91,9 @@ public class Main extends Application {
                 " will win.");
         primaryStage.setResizable(false); //doesn't let you resize window
 
-        try {
-            AudioClip audo = new AudioClip(getClass().getResource("music.mp3").toURI().toString());
-            audo.play();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
+        Media sound = new Media(new File("res/music.mp3").toURI().toString());
+        mediaPlayer = new MediaPlayer(sound);
+        mediaPlayer.play();
 
         try (InputStream is = Files.newInputStream(Paths.get("res/dbz.jpg"))) {
             ImageView img = new ImageView(new Image(is));
@@ -110,13 +120,12 @@ public class Main extends Application {
         MenuItem Exit = new MenuItem("Exit");
 
         MenuItem Help = new MenuItem("How to play");
-        MenuItem Volume = new MenuItem("Volume");
-        MenuItem Brightness = new MenuItem("Brightness");
+        MenuItem Volume = new MenuItem("Volume and Brightness");
         MenuItem Effects = new MenuItem("Effects");
         MenuItem goBack = new MenuItem("Go Back");
 
         MenuBox menuBox = new MenuBox(Create, Play, Options, Exit);
-        MenuBox optionsBox = new MenuBox(Help, Volume, Brightness, Effects);
+        MenuBox optionsBox = new MenuBox(Help, Volume, Effects);
         MenuBox volumeBox = new MenuBox(goBack);
 
         menuBox.setTranslateX(350);
@@ -128,7 +137,6 @@ public class Main extends Application {
 
         mainMenu.getChildren().addAll(menuBox);
         optionsMenu.getChildren().addAll(optionsBox, goBack);
-
 
         Exit.setOnMouseClicked(e -> {
             System.exit(0);
@@ -167,15 +175,32 @@ public class Main extends Application {
             primaryStage.setScene(optionsScene);
         });
 
-
         primaryStage.setTitle("DragonBall Ghetto");
         primaryStage.setScene(menuScene);
         primaryStage.show();
     }
 
+    public void sliderDragDetected (MouseEvent mouseEvent) {
+        volumeSlider.setValue(mediaPlayer.getVolume() * 100);
+        volumeSlider.valueProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                mediaPlayer.setVolume(volumeSlider.getValue() / 100);
+            }
+        });
+    }
+
+    public void brightnessMouseDrag (MouseEvent mouseEvent) {
+        double brightness = brightnessSlider.getValue();
+        colorAdjust.setBrightness(brightness);
+        parentFightScene.setEffect(colorAdjust);
+        parentVolumeScene.setEffect(colorAdjust);
+        mainMenu.setEffect(colorAdjust);
+        optionsMenu.setEffect(colorAdjust);
+    }
+
     public void backOnAction(ActionEvent actionEvent) {
         mainStage.setScene(optionsScene);
-        System.out.println("Heading back");
     }
 
     public void punchOnAction(ActionEvent actionEvent) { //punch button when clicked
@@ -287,3 +312,7 @@ public class Main extends Application {
         }
     }
 }
+
+/*works cited
+https://wallhere.com/en/wallpaper/606728
+*/
