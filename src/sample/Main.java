@@ -1,6 +1,5 @@
 package src.sample;
 
-import java.awt.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -9,11 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import javafx.application.Application;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Slider;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
@@ -22,14 +19,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.event.ActionEvent;
 import javafx.scene.image.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.scene.text.*;
 import javafx.scene.control.TextArea;
@@ -37,28 +31,44 @@ import javafx.scene.control.TextArea;
 import javafx.scene.media.MediaPlayer;
 
 import javax.swing.*;
-import java.io.File;
 
 
 public class Main extends Application {
     Boolean send;
-
+    public static Stage mainStage;
     String temp;
+
+    public static Pane mainMenu = new Pane();
+
+    public static Pane optionsMenu = new Pane();
+
+    public static Scene optionsScene = new Scene(optionsMenu);
+    public static Scene menuScene = new Scene(mainMenu);
 
     @FXML
     javafx.scene.control.TextField txtTypeMsg = new TextField(); //using the ID of of the messaging field
+
     @FXML
     TextArea txtChatBox = new TextArea(); //using the ID of the chatbox field
-    @FXML private Slider volumeSlider;
-
-
     private TextArea txtRules;
     private MediaPlayer mp;
-    private MediaView mv;
+
+    @FXML
+    private Button btnGoBack = new Button();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("Fight.fxml"));
+        mainStage = primaryStage;
+
+        mainMenu.setPrefSize(603, 400);
+        optionsMenu.setPrefSize(603, 400);
+
+        Parent parentFight = FXMLLoader.load(getClass().getResource("Fight.fxml"));
+        Parent parentVolume = FXMLLoader.load(getClass().getResource("Volume.fxml"));
+
+        Scene playScene = new Scene(parentFight, 603, 400);
+        Scene volumeScene = new Scene(parentVolume, 603, 400);
+
         txtRules = new TextArea();
         txtRules.setStyle("-fx-control-inner-background:blue; -fx-opacity: transparent");
         txtRules.setDisable(true);
@@ -67,46 +77,12 @@ public class Main extends Application {
                 " will win.");
         primaryStage.setResizable(false); //doesn't let you resize window
 
-
-
-
-
-
-
-        Pane mainMenu = new Pane();
-        mainMenu.setPrefSize(603, 400);
-
-        Pane optionsMenu = new Pane();
-        optionsMenu.setPrefSize(603, 400);
-
-        Scene optionsScene = new Scene(optionsMenu);
-        Scene menuScene = new Scene(mainMenu);
-        Scene playScene = new Scene(root, 603, 400);
-
-
         try {
-            Media audo = new Media(getClass().getResource("music.mp3").toURI().toString());
-            mp = new MediaPlayer(audo);
-           // mv.setMediaPlayer(mp);
-            mp.play();
-            mp.setRate(1);
-
-
-
+            AudioClip audo = new AudioClip(getClass().getResource("music.mp3").toURI().toString());
+            audo.play();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-
-
-
-
-
-
-
-
-
-
-
 
 
         try (InputStream is = Files.newInputStream(Paths.get("res/dbz.jpg"))) {
@@ -128,13 +104,6 @@ public class Main extends Application {
             System.out.println("Failed");
         }
 
-
-
-
-
-
-
-
         MenuItem Create = new MenuItem("Create New Character");
         MenuItem Play = new MenuItem("Play");
         MenuItem Options = new MenuItem("Options");
@@ -148,6 +117,7 @@ public class Main extends Application {
 
         MenuBox menuBox = new MenuBox(Create, Play, Options, Exit);
         MenuBox optionsBox = new MenuBox(Help, Volume, Brightness, Effects);
+        MenuBox volumeBox = new MenuBox(goBack);
 
         menuBox.setTranslateX(350);
         menuBox.setTranslateY(200);
@@ -156,10 +126,8 @@ public class Main extends Application {
         goBack.setTranslateX(10);
         goBack.setTranslateY(10);
 
-
         mainMenu.getChildren().addAll(menuBox);
         optionsMenu.getChildren().addAll(optionsBox, goBack);
-
 
 
         Exit.setOnMouseClicked(e -> {
@@ -177,9 +145,10 @@ public class Main extends Application {
 
         Play.setOnMouseClicked(e -> {
             primaryStage.setScene(playScene);
-            Server test = new Server();
-            test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            test.startRunning();
+            //Server test = new Server();
+            //test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            //test.startRunning();
+            //Server();
         });
 
         Help.setOnMouseClicked(e -> {
@@ -190,17 +159,23 @@ public class Main extends Application {
         });
 
 
-
         Volume.setOnMouseClicked(e -> {
-            txtRules.setVisible(true);
-            optionsMenu.getChildren().add(txtRules);
-            txtRules.setTranslateX(10);
-            txtRules.setTranslateY(200);
+            primaryStage.setScene(volumeScene);
         });
+
+        btnGoBack.setOnAction(e -> {
+            primaryStage.setScene(optionsScene);
+        });
+
 
         primaryStage.setTitle("DragonBall Ghetto");
         primaryStage.setScene(menuScene);
         primaryStage.show();
+    }
+
+    public void backOnAction(ActionEvent actionEvent) {
+        mainStage.setScene(optionsScene);
+        System.out.println("Heading back");
     }
 
     public void punchOnAction(ActionEvent actionEvent) { //punch button when clicked
@@ -226,23 +201,25 @@ public class Main extends Application {
     }
 
 
+
     public void client() throws IOException {
         if (send = Boolean.TRUE) {
-            Socket socket = new Socket("192.168.1.146", 8090);
+            Socket socket = new Socket("192.168.1.172", 8195);
             PrintWriter out = new PrintWriter(socket.getOutputStream());
             String request = temp;
-            out.print(request);
+            out.print(temp);
             out.flush();
+            System.out.println("hello");
+            socket.close();
             txtChatBox.setWrapText(true); //wraps to next line if message is too long
             txtChatBox.appendText(request + "\n"); //appends the message with a next line at the end of it
         }
     }
 
-
-    public void Server() throws IOException {
+    /*public void Server() throws IOException {
+        ServerSocket serverSocket = new ServerSocket(8095);
         while (true) {
             try {
-                ServerSocket serverSocket = new ServerSocket(8195);
                 Socket clientSocket = serverSocket.accept();
 
                 InputStream inStream = clientSocket.getInputStream();
@@ -255,22 +232,21 @@ public class Main extends Application {
                     System.out.println(line);
                 }
 
-            } catch (IOException e1) {
+            } catch (IOException e) {
                 System.out.println("Client Disconnected");
-                e1.printStackTrace();
-
+                e.printStackTrace();
 
             }
             //... input and output goes here ...
         }
-    }
+    }*/
 
 
     public void sendMessage() throws IOException {
         temp = txtTypeMsg.getText(); //temp is the whatever is in the text field
         txtTypeMsg.clear(); //clears message when it has been put into temp
         send = Boolean.TRUE;
-
+        //client();
     }
 
     private static class MenuBox extends VBox {
