@@ -23,7 +23,7 @@
    <children>
       <ImageView fitHeight="451.0" fitWidth="614.0" pickOnBounds="true" GridPane.rowIndex="1">
          <image>
-            <Image url="@/res/volume.jpeg" />
+            <Image url="@/res/volume.jpg" />
          </image>
       </ImageView>
       <Slider fx:id="sliderVolume" prefHeight="16.0" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
