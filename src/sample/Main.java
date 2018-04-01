@@ -2,6 +2,7 @@ package src.sample;
 
 import java.awt.*;
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URISyntaxException;
@@ -116,17 +117,6 @@ public class Main extends Application {
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
         try (InputStream is = Files.newInputStream(Paths.get("res/dbz.jpg"))) {
             ImageView img = new ImageView(new Image(is));
             img.setFitWidth(603);
@@ -145,13 +135,6 @@ public class Main extends Application {
         } catch (IOException x) {
             System.out.println("Failed");
         }
-
-
-
-
-
-
-
 
         MenuItem Create = new MenuItem("Create New Character");
         MenuItem Play = new MenuItem("Play");
@@ -193,10 +176,22 @@ public class Main extends Application {
             primaryStage.setScene(optionsScene);
         });
 
-        Play.setOnMouseClicked(e -> {
+        Play.setOnMouseClicked((MouseEvent e) -> {
 
             primaryStage.setScene(playScene);
 
+            Thread th = new Thread(() -> {
+                src.sample.Client charlie;
+                charlie = new src.sample.Client("127.0.0.1");
+                charlie.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                charlie.startRunning();
+                //Server test = new Server();
+                //test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                //test.startRunning();
+                //sendMessage();
+            });
+            th.setDaemon(true);
+            th.start();
 
         });
 
@@ -253,12 +248,12 @@ public class Main extends Application {
     }
 
     public void sendOnAction(ActionEvent actionEvent) throws IOException { //send button when clicked
-        sendMessage(); //calls send message function
+        //sendMessage(); //calls send message function
     }
 
     public void onSendEnter(KeyEvent keyEvent) throws IOException { //when you hit enter while in message field
         if (keyEvent.getCode().toString().equals("ENTER")){
-            sendMessage(); //calls send message function
+            //sendMessage(); //calls send message function
         }
     }
 
@@ -303,7 +298,7 @@ public class Main extends Application {
     }
 
 
-    public void sendMessage() throws IOException {
+    /*public void sendMessage() throws IOException {
         temp = txtTypeMsg.getText(); //temp is the whatever is in the text field
         Thread th = new Thread(() -> {
             try {
@@ -316,7 +311,7 @@ public class Main extends Application {
         th.start();
         txtTypeMsg.clear(); //clears message when it has been put into temp
         send = Boolean.TRUE;
-    }
+    }*/
 
     private static class MenuBox extends VBox {
         public MenuBox(MenuItem... items) {
