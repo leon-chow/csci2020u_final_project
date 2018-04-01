@@ -71,7 +71,6 @@ public class Main extends Application {
     ProgressBar playerHPProgress = new ProgressBar(playerHPValue);
     @FXML ProgressBar enemyHPProgress = new ProgressBar(enemyHPValue);
 
-
     @FXML
     private TextArea txtRules;
     private MediaPlayer mp;
@@ -87,11 +86,6 @@ public class Main extends Application {
                 " attacks,\n you can deal a significant amount of Health Points (HP). The last player who has not have their HP reduced\n to 0" +
                 " will win.");
         primaryStage.setResizable(false); //doesn't let you resize window
-
-
-
-
-
 
 
         Pane mainMenu = new Pane();
@@ -118,18 +112,6 @@ public class Main extends Application {
             e.printStackTrace();
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
         try (InputStream is = Files.newInputStream(Paths.get("res/dbz.jpg"))) {
             ImageView img = new ImageView(new Image(is));
             img.setFitWidth(603);
@@ -148,13 +130,6 @@ public class Main extends Application {
         } catch (IOException x) {
             System.out.println("Failed");
         }
-
-
-
-
-
-
-
 
         MenuItem Create = new MenuItem("Create New Character");
         MenuItem Play = new MenuItem("Play");
@@ -180,7 +155,6 @@ public class Main extends Application {
 
         mainMenu.getChildren().addAll(menuBox);
         optionsMenu.getChildren().addAll(optionsBox, goBack);
-
 
 
         Exit.setOnMouseClicked(e -> {
@@ -222,7 +196,6 @@ public class Main extends Application {
             txtRules.setTranslateX(10);
             txtRules.setTranslateY(200);
         });
-
 
 
         Volume.setOnMouseClicked(e -> {
@@ -310,6 +283,15 @@ public class Main extends Application {
         }
     }
 
+    public void picKiblastOnAaction(ActionEvent actionEvent) {
+    }
+
+    public void picPunchOnAction(ActionEvent actionEvent) {
+    }
+
+    public void picKickOnAction(ActionEvent actionEvent) {
+    }
+
 //TEHSEENS SERVER CODE, DO NOT USE
     /*
     public void client() throws IOException {
@@ -350,7 +332,6 @@ public class Main extends Application {
         }
     }
 */
-
 
 
     private static class MenuBox extends VBox {
