@@ -2,7 +2,6 @@ package src.sample;
 
 import java.awt.*;
 import java.io.*;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URISyntaxException;
@@ -61,7 +60,10 @@ public class Main extends Application {
     @FXML
     ImageView gokuattack = new ImageView();
     @FXML private Slider volumeSlider;
-
+    @FXML
+    ImageView gokukiblast = new ImageView();
+    @FXML
+    ImageView Naruto = new ImageView();
     final Float playerHPValue = 1.0f;
     final Float enemyHPValue = 1.0f;
 
@@ -109,12 +111,23 @@ public class Main extends Application {
            // mv.setMediaPlayer(mp);
             mp.play();
             mp.setRate(1);
-
-
+            mp.setVolume(0.1);
+            mp.getVolume();
 
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
+
+
+
+
+
+
+
+
+
+
+
 
 
         try (InputStream is = Files.newInputStream(Paths.get("res/dbz.jpg"))) {
@@ -135,6 +148,13 @@ public class Main extends Application {
         } catch (IOException x) {
             System.out.println("Failed");
         }
+
+
+
+
+
+
+
 
         MenuItem Create = new MenuItem("Create New Character");
         MenuItem Play = new MenuItem("Play");
@@ -176,7 +196,7 @@ public class Main extends Application {
             primaryStage.setScene(optionsScene);
         });
 
-        Play.setOnMouseClicked((MouseEvent e) -> {
+        Play.setOnMouseClicked(e -> {
 
             primaryStage.setScene(playScene);
 
@@ -192,7 +212,7 @@ public class Main extends Application {
             });
             th.setDaemon(true);
             th.start();
-
+            mp.setVolume(0.05);
         });
 
 
@@ -219,32 +239,65 @@ public class Main extends Application {
 
     public void punchOnAction(ActionEvent actionEvent) {
         //punch button when clicked
-        gokustanding.setVisible(false);
         gokuattack.setVisible(true);
+        gokustanding.setVisible(false);
         Timeline timeline = new Timeline(new KeyFrame(
-                Duration.millis(2300),
-                ae -> gokuattack.setVisible(false)));
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.stop();
+                Duration.seconds(2.64),
+                ae -> gokustanding.setVisible(true)));
         timeline.play();
 
+
         Timeline timeline1 = new Timeline(new KeyFrame(
-                Duration.millis(2300),
-                ae1 ->  gokustanding.setVisible(true)));
+                Duration.seconds(2.64),
+                ae -> gokuattack.setVisible(false)));
         timeline1.play();
-        timeline1.setCycleCount(Animation.INDEFINITE);
+
         enemyHPProgress.setProgress(enemyHPProgress.getProgress() - .1);
         System.out.println("Punch");
     }
 
     public void kiblastOnAction(ActionEvent actionEvent) {
 
+        //punch button when clicked
+        gokukiblast.setVisible(true);
+        gokustanding.setVisible(false);
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.seconds(1),
+                ae -> gokustanding.setVisible(true)));
+        timeline.play();
+
+
+        Timeline timeline1 = new Timeline(new KeyFrame(
+                Duration.seconds(1.00),
+                ae ->  gokukiblast.setVisible(false)));
+        timeline1.play();
+
+        enemyHPProgress.setProgress(enemyHPProgress.getProgress() - .1);
+        System.out.println("Punch");
+
+
         System.out.println("Ki Blast");
     }
 
     public void kickOnAction(ActionEvent actionEvent) {
+        //punch button when clicked
+        Naruto.setVisible(true);
+        gokustanding.setVisible(false);
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.seconds(2),
+                ae -> gokustanding.setVisible(true)));
+        timeline.play();
 
-        System.out.println("Kick");
+
+        Timeline timeline1 = new Timeline(new KeyFrame(
+                Duration.seconds(2),
+                ae ->  Naruto.setVisible(false)));
+        timeline1.play();
+
+        enemyHPProgress.setProgress(enemyHPProgress.getProgress() - .1);
+
+
+        System.out.println("Ki Blast");
     }
 
     public void sendOnAction(ActionEvent actionEvent) throws IOException { //send button when clicked
@@ -257,10 +310,11 @@ public class Main extends Application {
         }
     }
 
-
+//TEHSEENS SERVER CODE, DO NOT USE
+    /*
     public void client() throws IOException {
         if (send = Boolean.TRUE) {
-            Socket socket = new Socket("192.168.1.102", 8090);
+            Socket socket = new Socket("192.168.1.146", 8090);
             PrintWriter out = new PrintWriter(socket.getOutputStream());
             String request = temp;
             out.print(request);
@@ -269,7 +323,6 @@ public class Main extends Application {
             txtChatBox.appendText(request + "\n"); //appends the message with a next line at the end of it
         }
     }
-
 
     public void Server() throws IOException {
         while (true) {
@@ -296,22 +349,9 @@ public class Main extends Application {
             //... input and output goes here ...
         }
     }
+*/
 
 
-    /*public void sendMessage() throws IOException {
-        temp = txtTypeMsg.getText(); //temp is the whatever is in the text field
-        Thread th = new Thread(() -> {
-            try {
-                client();
-            } catch (IOException r) {
-                r.printStackTrace();
-            }
-        });
-        th.setDaemon(true);
-        th.start();
-        txtTypeMsg.clear(); //clears message when it has been put into temp
-        send = Boolean.TRUE;
-    }*/
 
     private static class MenuBox extends VBox {
         public MenuBox(MenuItem... items) {

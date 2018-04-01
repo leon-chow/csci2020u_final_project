@@ -112,5 +112,21 @@
             <Image url="@../../res/piccalostanding.gif" />
          </image>
       </ImageView>
+      <ImageView fx:id="gokukiblast" fitHeight="600.0" fitWidth="199.0" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@../../res/GokuKiBlast.gif" />
+         </image>
+         <GridPane.margin>
+            <Insets top="240.0" />
+         </GridPane.margin>
+      </ImageView>
+      <ImageView fx:id="Naruto" fitHeight="500.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@../../res/Naruto.gif" />
+         </image>
+         <GridPane.margin>
+            <Insets bottom="25.0" right="40.0" />
+         </GridPane.margin>
+      </ImageView>
    </children>
 </GridPane>
