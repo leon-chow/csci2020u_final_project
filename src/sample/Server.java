@@ -1,4 +1,4 @@
-package sample;
+package src.sample;
 import java.io.*;
 import java.net.*;
 import java.awt.*;
@@ -8,15 +8,15 @@ import javax.swing.*;
 public class Server extends JFrame {
 
 
-    private JTextField userText;
-    private  JTextArea chatwindow;
+    private TextField userText;
+    private  TextArea chatwindow;
     private ObjectOutputStream output;
     private ObjectInputStream input;
     private ServerSocket server;
     private Socket connection;
     public Server(){
         super("instant messanger");
-        userText = new JTextField();
+        userText = new TextField();
         userText.setEditable(false);
         userText.addActionListener(
                 new ActionListener() {
@@ -27,7 +27,7 @@ public class Server extends JFrame {
                 }
         );
         add(userText,BorderLayout.NORTH);
-        chatwindow = new JTextArea();
+        chatwindow = new TextArea();
         add(new JScrollPane(chatwindow));
         setSize(300,150);
         setVisible(true);
@@ -123,6 +123,7 @@ public class Server extends JFrame {
         );
     }
     // letting the other player type
+
     private void ableToType(final boolean tof){
         SwingUtilities.invokeLater(
                 new Runnable(){
