@@ -16,9 +16,11 @@ import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.media.*;
@@ -48,9 +50,32 @@ import java.sql.Time;
 
 public class Main extends Application {
     Boolean send;
-
+    public static Stage mainStage;
     String temp;
 
+    public static Pane mainMenu = new Pane();
+    public static Pane optionsMenu = new Pane();
+
+    public static Scene optionsScene = new Scene(optionsMenu);
+    public static Scene menuScene = new Scene(mainMenu);
+
+    public static Parent parentFightScene;
+    public static Parent parentVolumeScene;
+
+    public static ColorAdjust colorAdjust = new ColorAdjust();
+
+    public static BufferedReader br;
+    File helpFile = new File("src/sample/Instructions.txt");
+    File creditsFile = new File("src/sample/Credits.txt");
+
+    @FXML Button btnGoBack = new Button();
+    @FXML public Slider volumeSlider;
+    @FXML public Slider brightnessSlider;
+
+    @FXML
+    ImageView picoloStanding = new ImageView();
+    @FXML
+    ImageView picoloKiblast = new ImageView();
     @FXML
     javafx.scene.control.TextField txtTypeMsg = new TextField(); //using the ID of of the messaging field
     @FXML
@@ -59,7 +84,6 @@ public class Main extends Application {
     ImageView gokustanding = new ImageView();
     @FXML
     ImageView gokuattack = new ImageView();
-    @FXML private Slider volumeSlider;
     @FXML
     ImageView gokukiblast = new ImageView();
     @FXML
@@ -71,33 +95,35 @@ public class Main extends Application {
     ProgressBar playerHPProgress = new ProgressBar(playerHPValue);
     @FXML ProgressBar enemyHPProgress = new ProgressBar(enemyHPValue);
 
+
     @FXML
     private TextArea txtRules;
-    private MediaPlayer mp;
+    private static MediaPlayer mp;
     private MediaView mv;
     @Override
     public void start(Stage primaryStage) throws Exception {
+        mainStage = primaryStage;
         FXMLLoader loader = new FXMLLoader(getClass().getResource("fight.fxml"));
+        FXMLLoader volumeLoader = new FXMLLoader(getClass().getResource("Volume.fxml"));
+
         Parent root = (Parent)loader.load();
+        Parent volume = (Parent)volumeLoader.load();
+
+        parentFightScene = root;
+        parentVolumeScene = volume;
+
+        //loaded file in txtRules
         txtRules = new TextArea();
         txtRules.setStyle("-fx-control-inner-background:blue; -fx-opacity: transparent");
+        txtRules.setPrefSize(300,300);
         txtRules.setDisable(true);
-        txtRules.setText("How to Play:\n\nYou and other players will take turns to attack. By utilizing different abilities and" +
-                " attacks,\n you can deal a significant amount of Health Points (HP). The last player who has not have their HP reduced\n to 0" +
-                " will win.");
         primaryStage.setResizable(false); //doesn't let you resize window
 
-
-        Pane mainMenu = new Pane();
         mainMenu.setPrefSize(603, 400);
-
-        Pane optionsMenu = new Pane();
         optionsMenu.setPrefSize(603, 400);
 
-        Scene optionsScene = new Scene(optionsMenu);
-        Scene menuScene = new Scene(mainMenu);
         Scene playScene = new Scene(root, 603, 400);
-
+        Scene volumeScene = new Scene(volume, 603, 400);
 
         try {
             Media audo = new Media(getClass().getResource("music.mp3").toURI().toString());
@@ -138,12 +164,12 @@ public class Main extends Application {
 
         MenuItem Help = new MenuItem("How to play");
         MenuItem Volume = new MenuItem("Volume");
-        MenuItem Brightness = new MenuItem("Brightness");
-        MenuItem Effects = new MenuItem("Effects");
+        MenuItem Credits = new MenuItem("Credits");
         MenuItem goBack = new MenuItem("Go Back");
 
         MenuBox menuBox = new MenuBox(Create, Play, Options, Exit);
-        MenuBox optionsBox = new MenuBox(Help, Volume, Brightness, Effects);
+        MenuBox optionsBox = new MenuBox(Help, Volume, Credits);
+        MenuBox volumeBox = new MenuBox(goBack);
 
         menuBox.setTranslateX(350);
         menuBox.setTranslateY(200);
@@ -155,6 +181,7 @@ public class Main extends Application {
 
         mainMenu.getChildren().addAll(menuBox);
         optionsMenu.getChildren().addAll(optionsBox, goBack);
+
 
 
         Exit.setOnMouseClicked(e -> {
@@ -175,13 +202,13 @@ public class Main extends Application {
             primaryStage.setScene(playScene);
 
             Thread th = new Thread(() -> {
-                src.sample.Client charlie;
+                /*src.sample.Client charlie;
                 charlie = new src.sample.Client("127.0.0.1");
                 charlie.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                charlie.startRunning();
-                //Server test = new Server();
-                //test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                //test.startRunning();
+                charlie.startRunning(); */
+                Server test = new Server();
+                test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                test.startRunning();
                 //sendMessage();
             });
             th.setDaemon(true);
@@ -190,24 +217,89 @@ public class Main extends Application {
         });
 
 
-        Help.setOnMouseClicked(e -> {
-            txtRules.setVisible(true);
-            optionsMenu.getChildren().add(txtRules);
-            txtRules.setTranslateX(10);
-            txtRules.setTranslateY(200);
+        Help.setOnMouseClicked((MouseEvent e) -> {
+            try {
+                txtRules.clear();
+                txtRules.setWrapText(true);
+                br = new BufferedReader(new FileReader(helpFile));
+                String next = null;
+                if (txtRules.getLength() <= 0) {
+                    txtRules.appendText("How to play: \n \n");
+                    while ((next = br.readLine()) != null) {
+                        txtRules.appendText(next);
+                    }
+                }
+
+                txtRules.setVisible(true);
+                optionsMenu.getChildren().add(txtRules);
+
+                txtRules.setTranslateX(10);
+                txtRules.setTranslateY(50);
+                br.close();
+            } catch (FileNotFoundException error) {
+                error.printStackTrace();
+            } catch (IOException error) {
+                error.printStackTrace();
+            }
         });
 
+        Credits.setOnMouseClicked(e -> {
+            try {
+                txtRules.clear();
+                txtRules.setWrapText(true);
+                br = new BufferedReader(new FileReader(creditsFile));
+                String next = "";
+                if (txtRules.getLength() <= 0) {
+                    while ((next = br.readLine()) != null) {
+                        txtRules.appendText(next + "\n");
+                    }
+                }
+
+                txtRules.setVisible(true);
+                optionsMenu.getChildren().add(txtRules);
+
+                txtRules.setTranslateX(10);
+                txtRules.setTranslateY(50);
+                br.close();
+            } catch (FileNotFoundException error) {
+                error.printStackTrace();
+            } catch (IOException error) {
+                error.printStackTrace();
+            }
+        });
 
         Volume.setOnMouseClicked(e -> {
-            txtRules.setVisible(true);
-            optionsMenu.getChildren().add(txtRules);
-            txtRules.setTranslateX(10);
-            txtRules.setTranslateY(200);
+            txtRules.setVisible(false);
+            primaryStage.setScene(volumeScene);
         });
 
         primaryStage.setTitle("DragonBall Ghetto");
         primaryStage.setScene(menuScene);
         primaryStage.show();
+    }
+
+    public void sliderDragDetected (MouseEvent mouseEvent) {
+        volumeSlider.setValue(mp.getVolume() * 100);
+        volumeSlider.valueProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                mp.setVolume(volumeSlider.getValue() / 100);
+            }
+        });
+    }
+
+    public void brightnessMouseDrag (MouseEvent mouseEvent) {
+        double brightness = brightnessSlider.getValue();
+        colorAdjust.setBrightness(brightness);
+        parentFightScene.setEffect(colorAdjust);
+        parentVolumeScene.setEffect(colorAdjust);
+        mainMenu.setEffect(colorAdjust);
+        optionsMenu.setEffect(colorAdjust);
+    }
+
+    public void backOnAction(ActionEvent actionEvent) {
+        System.out.println("Testing...");
+        mainStage.setScene(optionsScene);
     }
 
     public void punchOnAction(ActionEvent actionEvent) {
@@ -284,6 +376,25 @@ public class Main extends Application {
     }
 
     public void picKiblastOnAaction(ActionEvent actionEvent) {
+        pickiblast();
+    }
+
+    public void pickiblast(){
+        picoloKiblast.setVisible(true);
+        picoloStanding.setVisible(false);
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.seconds(1.64),
+                ae -> picoloStanding.setVisible(true)));
+        timeline.play();
+
+
+        Timeline timeline1 = new Timeline(new KeyFrame(
+                Duration.seconds(1.64),
+                ae -> picoloKiblast.setVisible(false)));
+        timeline1.play();
+
+        playerHPProgress.setProgress(playerHPProgress.getProgress() - .1);
+        System.out.println("Picolo KiBlast");
     }
 
     public void picPunchOnAction(ActionEvent actionEvent) {
@@ -291,7 +402,6 @@ public class Main extends Application {
 
     public void picKickOnAction(ActionEvent actionEvent) {
     }
-
 //TEHSEENS SERVER CODE, DO NOT USE
     /*
     public void client() throws IOException {
@@ -332,6 +442,7 @@ public class Main extends Application {
         }
     }
 */
+
 
 
     private static class MenuBox extends VBox {

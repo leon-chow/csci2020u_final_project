@@ -32,6 +32,13 @@
          </image>
       </ImageView>
       <ImageView fx:id="SpriteMovement" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="picoloKiblast" fitHeight="454.0" fitWidth="605.0" pickOnBounds="true" preserveRatio="true" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+         <image>
+            <Image url="@../../res/piccalokiblast.gif" />
+         </image>
+         <GridPane.margin>
+            <Insets bottom="190.0" left="-169.0" />
+         </GridPane.margin></ImageView>
       <ImageView fitHeight="135.0" fitWidth="605.0" pickOnBounds="true" GridPane.rowIndex="3">
          <image>
             <Image url="@/res/Control_Container.png" />
@@ -98,7 +105,7 @@
          <image>
             <Image url="@../../res/gokucombo.gif" />
          </image></ImageView>
-      <ImageView fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="3">
+      <ImageView fx:id="picoloStanding" fitHeight="267.0" fitWidth="292.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="3">
          <GridPane.margin>
             <Insets bottom="400.0" />
          </GridPane.margin>
