@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Random;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -52,7 +53,7 @@ public class Main extends Application{
     Boolean send;
     public static Stage mainStage;
 
-    public float damage = 0.1f;
+    public float damage;
 
     public static int turnCounter = 0;
 
@@ -61,11 +62,7 @@ public class Main extends Application{
 
     public static Scene optionsScene = new Scene(optionsMenu);
     public static Scene menuScene = new Scene(mainMenu);
-
-
-
-
-
+    
     String temp;
 
     public static Parent parentFightScene;
@@ -372,6 +369,13 @@ public class Main extends Application{
         btnPicPunch.setDisable(true);
     }
 
+    public float getRandom(){
+        Random rand = new Random();
+        float result = rand.nextFloat() * (0.5f - 0.0f) + 0.0f;
+
+        return result;
+    }
+
 
     public void punchOnAction(ActionEvent actionEvent) throws IOException {
         //punch button when clicked
@@ -393,6 +397,7 @@ public class Main extends Application{
                 ae -> gokuattack.setVisible(false)));
         timeline1.play();
 
+        damage = getRandom();
         enemyHPValue -= damage;
         enemyHPProgress.setProgress(enemyHPValue);
         System.out.println("Special KameHameHa");
@@ -419,6 +424,7 @@ public class Main extends Application{
                 ae ->  gokukiblast.setVisible(false)));
         timeline1.play();
 
+        damage = getRandom();
         enemyHPValue -= damage;
         enemyHPProgress.setProgress(enemyHPValue);
 
@@ -447,6 +453,7 @@ public class Main extends Application{
                 ae ->  Naruto.setVisible(false)));
         timeline1.play();
 
+        damage = getRandom();
         enemyHPValue -= damage;
         enemyHPProgress.setProgress(enemyHPValue);
 
@@ -483,6 +490,7 @@ public class Main extends Application{
                 ae -> picoloKiblast.setVisible(false)));
         timeline1.play();
 
+        damage = getRandom();
         playerHPValue -= damage;
         playerHPProgress.setProgress(playerHPValue);
         System.out.println("Picolo KiBlast");
@@ -508,6 +516,7 @@ public class Main extends Application{
                 ae -> SpecialBeam.setVisible(false)));
         timeline1.play();
 
+        damage = getRandom();
         playerHPValue -= damage;
         playerHPProgress.setProgress(playerHPValue);
         System.out.println("Picolo Special Beam Cannon");
@@ -533,6 +542,7 @@ public class Main extends Application{
                 ae ->  picKick.setVisible(false)));
         timeline1.play();
 
+        damage = getRandom();
         playerHPValue -= damage;
         playerHPProgress.setProgress(playerHPValue);
         System.out.println("Picolo Kick");
