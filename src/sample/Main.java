@@ -62,6 +62,10 @@ public class Main extends Application{
     public static Scene optionsScene = new Scene(optionsMenu);
     public static Scene menuScene = new Scene(mainMenu);
 
+
+
+
+
     String temp;
 
     public static Parent parentFightScene;
@@ -225,7 +229,6 @@ public class Main extends Application{
             primaryStage.setScene(playScene);
 
             Thread th = new Thread(() -> {
-
                 Server test = new Server();
                 test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 test.startRunning();
@@ -234,13 +237,13 @@ public class Main extends Application{
             th.setDaemon(true);
             th.start();
 
-
             Thread ts = new Thread(() -> {
                 Client charlie;
                 charlie = new Client("10.190.39.176");
                 charlie.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 charlie.startRunning();
             });
+
             ts.setDaemon(true);
 
             Timeline timeline1 = new Timeline(new KeyFrame(
@@ -337,7 +340,7 @@ public class Main extends Application{
     }
 
     public void backToMainMenu(ActionEvent actionEvent) {
-        mainStage.setScene(menuScene);
+        System.exit(0);
     }
 
     public void setGokuTurn() throws IOException {
@@ -360,11 +363,20 @@ public class Main extends Application{
         btnPunch.setDisable(true);
     }
 
+    public void allDisable(){
+        btnKiblast.setDisable(true);
+        btnKick.setDisable(true);
+        btnPunch.setDisable(true);
+        btnPicKiblast.setDisable(true);
+        btnPicKick.setDisable(true);
+        btnPicPunch.setDisable(true);
+    }
+
 
     public void punchOnAction(ActionEvent actionEvent) throws IOException {
         //punch button when clicked
-        punch();
         setPicoloTurn();
+        punch();
     }
 
     public void punch() throws IOException {
@@ -389,8 +401,8 @@ public class Main extends Application{
 
     public void kiblastOnAction(ActionEvent actionEvent) throws IOException {
         //punch button when clicked
-        kiblast();
         setPicoloTurn();
+        kiblast();
     }
 
     public void kiblast() throws IOException {
@@ -418,8 +430,8 @@ public class Main extends Application{
 
     public void kickOnAction(ActionEvent actionEvent) throws IOException {
         //punch button when clicked
-        kick();
         setPicoloTurn();
+        kick();
     }
 
     public void kick() throws IOException {
@@ -453,8 +465,8 @@ public class Main extends Application{
     }
 
     public void picKiblastOnAaction(ActionEvent actionEvent) throws IOException {
-        pickiblast();
         setGokuTurn();
+        pickiblast();
     }
 
     public void pickiblast() throws IOException {
@@ -478,8 +490,8 @@ public class Main extends Application{
     }
 
     public void picPunchOnAction(ActionEvent actionEvent) throws IOException {
-        picPunch();
         setGokuTurn();
+        picPunch();
     }
 
     public void picPunch() throws IOException {
@@ -503,8 +515,8 @@ public class Main extends Application{
     }
 
     public void picKickOnAction(ActionEvent actionEvent) throws IOException {
-        picKick();
         setGokuTurn();
+        picKick();
     }
 
     public void picKick() throws IOException {
@@ -528,8 +540,8 @@ public class Main extends Application{
     }
 
     public void checkGameOver() throws IOException{
-        System.out.println(playerHPProgress + " " + enemyHPProgress);
-        if (playerHPProgress.getProgress() <= 0 || enemyHPProgress.getProgress() <= 0) {
+        if (playerHPValue <= 0 || enemyHPValue <= 0) {
+            allDisable();
             System.out.println("Game Over");
             BufferedWriter bw = new BufferedWriter(new FileWriter(gameLengths, true));
             bw.append("Number of turns taken: " + turnCounter);
@@ -541,14 +553,6 @@ public class Main extends Application{
                     Duration.seconds(4.00),
                     ae ->  mainStage.setScene(globalGameOverScene)));
             timeline5.play();
-            Timeline timeline6 = new Timeline(new KeyFrame(
-                    Duration.seconds(5.00),
-                    ae -> playerHPProgress.setProgress(1f)));
-            timeline6.play();
-            Timeline timeline7 = new Timeline(new KeyFrame(
-                    Duration.seconds(5.00),
-                    ae -> enemyHPProgress.setProgress(1f)));
-            timeline7.play();
         }
         turnCounter++;
     }

@@ -44,17 +44,17 @@
             <Image url="@/res/Control_Container.png" />
          </image>
       </ImageView>
-      <Button fx:id="btnPicKick" mnemonicParsing="false" onAction="#picKickOnAction" prefHeight="30.0" prefWidth="139.0" text="Picolo Kick" GridPane.columnIndex="2" GridPane.rowIndex="3">
+      <Button fx:id="btnPicKick" mnemonicParsing="false" onAction="#picKickOnAction" prefHeight="30.0" prefWidth="139.0" text="Kick" GridPane.columnIndex="2" GridPane.rowIndex="3">
          <GridPane.margin>
             <Insets left="55.0" top="70.0" />
          </GridPane.margin>
       </Button>
-      <Button fx:id="btnPicKiblast" mnemonicParsing="false" onAction="#picKiblastOnAaction" prefHeight="29.0" prefWidth="139.0" text="Special Beam Cannon" GridPane.columnIndex="2" GridPane.rowIndex="3">
+      <Button fx:id="btnPicKiblast" mnemonicParsing="false" onAction="#picKiblastOnAaction" prefHeight="29.0" prefWidth="139.0" text="Ki Blast" GridPane.columnIndex="2" GridPane.rowIndex="3">
          <GridPane.margin>
             <Insets left="55.0" />
          </GridPane.margin>
       </Button>
-      <Button fx:id="btnPicPunch" mnemonicParsing="false" onAction="#picPunchOnAction" prefHeight="29.0" prefWidth="140.0" text="Picolo KI Blast" GridPane.columnIndex="2" GridPane.rowIndex="3">
+      <Button fx:id="btnPicPunch" mnemonicParsing="false" onAction="#picPunchOnAction" prefHeight="29.0" prefWidth="140.0" text="Beam Cannon" GridPane.columnIndex="2" GridPane.rowIndex="3">
          <GridPane.margin>
             <Insets bottom="70.0" left="55.0" />
          </GridPane.margin>
