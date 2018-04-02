@@ -49,12 +49,12 @@
             <Insets left="55.0" top="70.0" />
          </GridPane.margin>
       </Button>
-      <Button fx:id="btnPicKiblast" mnemonicParsing="false" onAction="#picKiblastOnAaction" prefHeight="29.0" prefWidth="139.0" text="Picolo Ki Blast" GridPane.columnIndex="2" GridPane.rowIndex="3">
+      <Button fx:id="btnPicKiblast" mnemonicParsing="false" onAction="#picKiblastOnAaction" prefHeight="29.0" prefWidth="139.0" text="Special Beam Cannon" GridPane.columnIndex="2" GridPane.rowIndex="3">
          <GridPane.margin>
             <Insets left="55.0" />
          </GridPane.margin>
       </Button>
-      <Button fx:id="btnPicPunch" mnemonicParsing="false" onAction="#picPunchOnAction" prefHeight="29.0" prefWidth="140.0" text="Picolo Punch" GridPane.columnIndex="2" GridPane.rowIndex="3">
+      <Button fx:id="btnPicPunch" mnemonicParsing="false" onAction="#picPunchOnAction" prefHeight="29.0" prefWidth="140.0" text="Picolo KI Blast" GridPane.columnIndex="2" GridPane.rowIndex="3">
          <GridPane.margin>
             <Insets bottom="70.0" left="55.0" />
          </GridPane.margin>
@@ -62,7 +62,7 @@
             <Insets />
          </opaqueInsets>
       </Button>
-      <Button fx:id="btnKick" mnemonicParsing="false" onAction="#kickOnAction" prefHeight="27.0" prefWidth="142.0" text="Kick" GridPane.rowIndex="3">
+      <Button fx:id="btnKick" mnemonicParsing="false" onAction="#kickOnAction" prefHeight="27.0" prefWidth="142.0" text="Naruto Assist" GridPane.rowIndex="3">
          <opaqueInsets>
             <Insets />
          </opaqueInsets>
@@ -73,7 +73,7 @@
          <GridPane.margin>
             <Insets left="9.0" />
          </GridPane.margin></Button>
-      <Button fx:id="btnPunch" mnemonicParsing="false" onAction="#punchOnAction" prefHeight="27.0" prefWidth="143.0" text="Punch" GridPane.rowIndex="3">
+      <Button fx:id="btnPunch" mnemonicParsing="false" onAction="#punchOnAction" prefHeight="27.0" prefWidth="143.0" text="Special Kamahamha" GridPane.rowIndex="3">
          <GridPane.margin>
             <Insets bottom="70.0" left="9.0" />
          </GridPane.margin>
@@ -127,6 +127,22 @@
          </image>
          <GridPane.margin>
             <Insets bottom="25.0" right="40.0" />
+         </GridPane.margin>
+      </ImageView>
+      <ImageView fx:id="SpecialBeam" fitHeight="900.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@../../res/piccaloattack.gif" />
+         </image>
+         <GridPane.margin>
+            <Insets left="90.0" top="170.0" />
+         </GridPane.margin>
+      </ImageView>
+      <ImageView fx:id="picKick" fitHeight="900.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@../../res/piccolo%20kick.gif" />
+         </image>
+         <GridPane.margin>
+            <Insets left="200.0" top="270.0" />
          </GridPane.margin>
       </ImageView>
    </children>
