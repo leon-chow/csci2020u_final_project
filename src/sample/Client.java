@@ -16,7 +16,7 @@ public class Client extends JFrame {
     private  ObjectInputStream input;
     private String message = "";
     private  String ServerIP;
-    private Socket connection;
+    public Socket connection;
 
     public Client(String host){
         super("client");
