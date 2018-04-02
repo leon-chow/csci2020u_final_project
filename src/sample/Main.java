@@ -53,6 +53,8 @@ public class Main extends Application {
     public static Stage mainStage;
     String temp;
 
+    public static int turnCounter = 0;
+
     public static Pane mainMenu = new Pane();
     public static Pane optionsMenu = new Pane();
 
@@ -61,12 +63,16 @@ public class Main extends Application {
 
     public static Parent parentFightScene;
     public static Parent parentVolumeScene;
+    public static Parent parentGameOver;
+
+    public static Scene globalGameOverScene;
 
     public static ColorAdjust colorAdjust = new ColorAdjust();
 
     public static BufferedReader br;
     File helpFile = new File("src/sample/Instructions.txt");
     File creditsFile = new File("src/sample/Credits.txt");
+    File gameLengths = new File("src/sample/GameLengths.txt");
 
     @FXML Button btnGoBack = new Button();
     @FXML public Slider volumeSlider;
@@ -95,6 +101,14 @@ public class Main extends Application {
     ProgressBar playerHPProgress = new ProgressBar(playerHPValue);
     @FXML ProgressBar enemyHPProgress = new ProgressBar(enemyHPValue);
 
+    @FXML Button btnPunch = new Button();
+    @FXML Button btnPicPunch = new Button();
+
+    @FXML Button btnKick = new Button();
+    @FXML Button btnPicKick = new Button();
+
+    @FXML Button btnKiblast = new Button();
+    @FXML Button btnPicKiblast = new Button();
 
     @FXML
     private TextArea txtRules;
@@ -105,12 +119,15 @@ public class Main extends Application {
         mainStage = primaryStage;
         FXMLLoader loader = new FXMLLoader(getClass().getResource("fight.fxml"));
         FXMLLoader volumeLoader = new FXMLLoader(getClass().getResource("Volume.fxml"));
+        FXMLLoader gameOverLoader = new FXMLLoader(getClass().getResource("GameOver.fxml"));
 
         Parent root = (Parent)loader.load();
         Parent volume = (Parent)volumeLoader.load();
+        Parent gameOver = (Parent)gameOverLoader.load();
 
         parentFightScene = root;
         parentVolumeScene = volume;
+        parentGameOver = gameOver;
 
         //loaded file in txtRules
         txtRules = new TextArea();
@@ -124,6 +141,9 @@ public class Main extends Application {
 
         Scene playScene = new Scene(root, 603, 400);
         Scene volumeScene = new Scene(volume, 603, 400);
+        Scene gameOverScene = new Scene(gameOver, 603, 400);
+
+        globalGameOverScene = gameOverScene;
 
         try {
             Media audo = new Media(getClass().getResource("music.mp3").toURI().toString());
@@ -157,7 +177,6 @@ public class Main extends Application {
             System.out.println("Failed");
         }
 
-        MenuItem Create = new MenuItem("Create New Character");
         MenuItem Play = new MenuItem("Play");
         MenuItem Options = new MenuItem("Options");
         MenuItem Exit = new MenuItem("Exit");
@@ -167,7 +186,7 @@ public class Main extends Application {
         MenuItem Credits = new MenuItem("Credits");
         MenuItem goBack = new MenuItem("Go Back");
 
-        MenuBox menuBox = new MenuBox(Create, Play, Options, Exit);
+        MenuBox menuBox = new MenuBox(Play, Options, Exit);
         MenuBox optionsBox = new MenuBox(Help, Volume, Credits);
         MenuBox volumeBox = new MenuBox(goBack);
 
@@ -302,7 +321,8 @@ public class Main extends Application {
         mainStage.setScene(optionsScene);
     }
 
-    public void punchOnAction(ActionEvent actionEvent) {
+    public void punchOnAction(ActionEvent actionEvent) throws IOException {
+        checkGameOver();
         //punch button when clicked
         gokuattack.setVisible(true);
         gokustanding.setVisible(false);
@@ -321,8 +341,8 @@ public class Main extends Application {
         System.out.println("Punch");
     }
 
-    public void kiblastOnAction(ActionEvent actionEvent) {
-
+    public void kiblastOnAction(ActionEvent actionEvent) throws IOException {
+        checkGameOver();
         //punch button when clicked
         gokukiblast.setVisible(true);
         gokustanding.setVisible(false);
@@ -344,8 +364,10 @@ public class Main extends Application {
         System.out.println("Ki Blast");
     }
 
-    public void kickOnAction(ActionEvent actionEvent) {
+    public void kickOnAction(ActionEvent actionEvent) throws IOException {
+
         //punch button when clicked
+        checkGameOver();
         Naruto.setVisible(true);
         gokustanding.setVisible(false);
         Timeline timeline = new Timeline(new KeyFrame(
@@ -375,7 +397,12 @@ public class Main extends Application {
         }
     }
 
-    public void picKiblastOnAaction(ActionEvent actionEvent) {
+    public void backToMainMenu(ActionEvent actionEvent) {
+        mainStage.setScene(menuScene);
+    }
+
+    public void picKiblastOnAaction(ActionEvent actionEvent) throws IOException {
+        checkGameOver();
         pickiblast();
     }
 
@@ -402,6 +429,23 @@ public class Main extends Application {
 
     public void picKickOnAction(ActionEvent actionEvent) {
     }
+
+    public void checkGameOver() throws IOException{
+        if (playerHPProgress.getProgress() <= 0 || enemyHPProgress.getProgress() <= 0) {
+            System.out.println("Game Over");
+            playerHPProgress.setProgress(1);
+            enemyHPProgress.setProgress(1);
+            BufferedWriter bw = new BufferedWriter(new FileWriter(gameLengths, true));
+            bw.append("Number of turns taken: " + turnCounter);
+            bw.newLine();
+            bw.flush();
+            bw.close();
+            turnCounter = 0;
+            mainStage.setScene(globalGameOverScene);
+        }
+        turnCounter++;
+    }
+
 //TEHSEENS SERVER CODE, DO NOT USE
     /*
     public void client() throws IOException {
