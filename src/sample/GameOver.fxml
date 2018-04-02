@@ -27,13 +27,16 @@
       <RowConstraints maxHeight="135.0" minHeight="10.0" prefHeight="95.0" vgrow="SOMETIMES" />
     </rowConstraints>
    <children>
-      <ImageView fitHeight="451.0" fitWidth="614.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="5">
+      <ImageView fitHeight="643.0" fitWidth="774.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="5">
          <image>
             <Image url="@../../res/gameOver.jpg" />
-         </image></ImageView>
-      <Button fx:id="btnMainMenu" mnemonicParsing="false" onAction="#backToMainMenu" text="Back to Main Menu" GridPane.columnIndex="1" GridPane.rowIndex="6" GridPane.valignment="BOTTOM">
+         </image>
          <GridPane.margin>
-            <Insets left="-20.0" />
+            <Insets left="-85.0" />
+         </GridPane.margin></ImageView>
+      <Button fx:id="btnMainMenu" mnemonicParsing="false" onAction="#backToMainMenu" prefHeight="27.0" prefWidth="212.0" text="Exit" GridPane.columnIndex="1" GridPane.rowIndex="6" GridPane.valignment="BOTTOM">
+         <GridPane.margin>
+            <Insets />
          </GridPane.margin>
       </Button>
    </children>
