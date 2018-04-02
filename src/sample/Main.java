@@ -1,5 +1,6 @@
 package src.sample;
 
+import java.awt.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,46 +8,54 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.media.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.event.ActionEvent;
 import javafx.scene.image.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.scene.text.*;
 import javafx.scene.control.TextArea;
 
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 
 import javax.swing.*;
+import java.io.File;
+import java.sql.Time;
 
 
 public class Main extends Application {
     Boolean send;
     public static Stage mainStage;
     String temp;
-    private static MediaPlayer mediaPlayer;
+
+    public static int turnCounter = 0;
 
     public static Pane mainMenu = new Pane();
-
     public static Pane optionsMenu = new Pane();
 
     public static Scene optionsScene = new Scene(optionsMenu);
@@ -54,48 +63,100 @@ public class Main extends Application {
 
     public static Parent parentFightScene;
     public static Parent parentVolumeScene;
+    public static Parent parentGameOver;
+
+    public static Scene globalGameOverScene;
+
+    public static ColorAdjust colorAdjust = new ColorAdjust();
 
     public static BufferedReader br;
     File helpFile = new File("src/sample/Instructions.txt");
     File creditsFile = new File("src/sample/Credits.txt");
+    File gameLengths = new File("src/sample/GameLengths.txt");
 
-    @FXML javafx.scene.control.TextField txtTypeMsg = new TextField(); //using the ID of of the messaging field
-
-    @FXML TextArea txtChatBox = new TextArea(); //using the ID of the chatbox field
-    public static TextArea txtRules;
-
+    @FXML Button btnGoBack = new Button();
     @FXML public Slider volumeSlider;
     @FXML public Slider brightnessSlider;
 
-    @FXML private Button btnGoBack = new Button();
+    @FXML
+    ImageView picoloStanding = new ImageView();
+    @FXML
+    ImageView picoloKiblast = new ImageView();
+    @FXML
+    javafx.scene.control.TextField txtTypeMsg = new TextField(); //using the ID of of the messaging field
+    @FXML
+    TextArea txtChatBox = new TextArea(); //using the ID of the chatbox field
+    @FXML
+    ImageView gokustanding = new ImageView();
+    @FXML
+    ImageView gokuattack = new ImageView();
+    @FXML
+    ImageView gokukiblast = new ImageView();
+    @FXML
+    ImageView Naruto = new ImageView();
+    final Float playerHPValue = 1.0f;
+    final Float enemyHPValue = 1.0f;
 
-    public static ColorAdjust colorAdjust = new ColorAdjust();
+    @FXML
+    ProgressBar playerHPProgress = new ProgressBar(playerHPValue);
+    @FXML ProgressBar enemyHPProgress = new ProgressBar(enemyHPValue);
 
+    @FXML Button btnPunch = new Button();
+    @FXML Button btnPicPunch = new Button();
+
+    @FXML Button btnKick = new Button();
+    @FXML Button btnPicKick = new Button();
+
+    @FXML Button btnKiblast = new Button();
+    @FXML Button btnPicKiblast = new Button();
+
+    @FXML
+    private TextArea txtRules;
+    private static MediaPlayer mp;
+    private MediaView mv;
     @Override
     public void start(Stage primaryStage) throws Exception {
         mainStage = primaryStage;
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("fight.fxml"));
+        FXMLLoader volumeLoader = new FXMLLoader(getClass().getResource("Volume.fxml"));
+        FXMLLoader gameOverLoader = new FXMLLoader(getClass().getResource("GameOver.fxml"));
 
-        mainMenu.setPrefSize(603, 400);
-        optionsMenu.setPrefSize(603, 400);
+        Parent root = (Parent)loader.load();
+        Parent volume = (Parent)volumeLoader.load();
+        Parent gameOver = (Parent)gameOverLoader.load();
 
-        Parent parentFight = FXMLLoader.load(getClass().getResource("Fight.fxml"));
-        Parent parentVolume = FXMLLoader.load(getClass().getResource("Volume.fxml"));
+        parentFightScene = root;
+        parentVolumeScene = volume;
+        parentGameOver = gameOver;
 
-        parentFightScene = parentFight;
-        parentVolumeScene = parentVolume;
-
-        Scene playScene = new Scene(parentFight, 603, 400);
-        Scene volumeScene = new Scene(parentVolume, 603, 400);
-
+        //loaded file in txtRules
         txtRules = new TextArea();
         txtRules.setStyle("-fx-control-inner-background:blue; -fx-opacity: transparent");
         txtRules.setPrefSize(300,300);
         txtRules.setDisable(true);
         primaryStage.setResizable(false); //doesn't let you resize window
 
-        Media sound = new Media(new File("res/music.mp3").toURI().toString());
-        mediaPlayer = new MediaPlayer(sound);
-        mediaPlayer.play();
+        mainMenu.setPrefSize(603, 400);
+        optionsMenu.setPrefSize(603, 400);
+
+        Scene playScene = new Scene(root, 603, 400);
+        Scene volumeScene = new Scene(volume, 603, 400);
+        Scene gameOverScene = new Scene(gameOver, 603, 400);
+
+        globalGameOverScene = gameOverScene;
+
+        try {
+            Media audo = new Media(getClass().getResource("music.mp3").toURI().toString());
+            mp = new MediaPlayer(audo);
+           // mv.setMediaPlayer(mp);
+            mp.play();
+            mp.setRate(1);
+            mp.setVolume(0.1);
+            mp.getVolume();
+
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
 
         try (InputStream is = Files.newInputStream(Paths.get("res/dbz.jpg"))) {
             ImageView img = new ImageView(new Image(is));
@@ -116,17 +177,16 @@ public class Main extends Application {
             System.out.println("Failed");
         }
 
-        MenuItem Create = new MenuItem("Create New Character");
         MenuItem Play = new MenuItem("Play");
         MenuItem Options = new MenuItem("Options");
         MenuItem Exit = new MenuItem("Exit");
 
         MenuItem Help = new MenuItem("How to play");
-        MenuItem Volume = new MenuItem("Volume and Brightness");
+        MenuItem Volume = new MenuItem("Volume");
         MenuItem Credits = new MenuItem("Credits");
         MenuItem goBack = new MenuItem("Go Back");
 
-        MenuBox menuBox = new MenuBox(Create, Play, Options, Exit);
+        MenuBox menuBox = new MenuBox(Play, Options, Exit);
         MenuBox optionsBox = new MenuBox(Help, Volume, Credits);
         MenuBox volumeBox = new MenuBox(goBack);
 
@@ -137,8 +197,11 @@ public class Main extends Application {
         goBack.setTranslateX(10);
         goBack.setTranslateY(10);
 
+
         mainMenu.getChildren().addAll(menuBox);
         optionsMenu.getChildren().addAll(optionsBox, goBack);
+
+
 
         Exit.setOnMouseClicked(e -> {
             System.exit(0);
@@ -154,12 +217,24 @@ public class Main extends Application {
         });
 
         Play.setOnMouseClicked(e -> {
+
             primaryStage.setScene(playScene);
-            //Server test = new Server();
-            //test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            //test.startRunning();
-            //Server();
+
+            Thread th = new Thread(() -> {
+                /*src.sample.Client charlie;
+                charlie = new src.sample.Client("127.0.0.1");
+                charlie.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                charlie.startRunning(); */
+                Server test = new Server();
+                test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                test.startRunning();
+                //sendMessage();
+            });
+            th.setDaemon(true);
+            th.start();
+            mp.setVolume(0.05);
         });
+
 
         Help.setOnMouseClicked((MouseEvent e) -> {
             try {
@@ -217,23 +292,17 @@ public class Main extends Application {
             primaryStage.setScene(volumeScene);
         });
 
-        btnGoBack.setOnAction(e -> {
-            primaryStage.setScene(optionsScene);
-        });
-
-
-
         primaryStage.setTitle("DragonBall Ghetto");
         primaryStage.setScene(menuScene);
         primaryStage.show();
     }
 
     public void sliderDragDetected (MouseEvent mouseEvent) {
-        volumeSlider.setValue(mediaPlayer.getVolume() * 100);
+        volumeSlider.setValue(mp.getVolume() * 100);
         volumeSlider.valueProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
-                mediaPlayer.setVolume(volumeSlider.getValue() / 100);
+                mp.setVolume(volumeSlider.getValue() / 100);
             }
         });
     }
@@ -248,51 +317,153 @@ public class Main extends Application {
     }
 
     public void backOnAction(ActionEvent actionEvent) {
+        System.out.println("Testing...");
         mainStage.setScene(optionsScene);
     }
 
-    public void punchOnAction(ActionEvent actionEvent) { //punch button when clicked
+    public void punchOnAction(ActionEvent actionEvent) throws IOException {
+        checkGameOver();
+        //punch button when clicked
+        gokuattack.setVisible(true);
+        gokustanding.setVisible(false);
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.seconds(2.64),
+                ae -> gokustanding.setVisible(true)));
+        timeline.play();
+
+
+        Timeline timeline1 = new Timeline(new KeyFrame(
+                Duration.seconds(2.64),
+                ae -> gokuattack.setVisible(false)));
+        timeline1.play();
+
+        enemyHPProgress.setProgress(enemyHPProgress.getProgress() - .1);
         System.out.println("Punch");
     }
 
-    public void kiblastOnAction(ActionEvent actionEvent) { //ki blast button when clicked
+    public void kiblastOnAction(ActionEvent actionEvent) throws IOException {
+        checkGameOver();
+        //punch button when clicked
+        gokukiblast.setVisible(true);
+        gokustanding.setVisible(false);
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.seconds(1),
+                ae -> gokustanding.setVisible(true)));
+        timeline.play();
+
+
+        Timeline timeline1 = new Timeline(new KeyFrame(
+                Duration.seconds(1.00),
+                ae ->  gokukiblast.setVisible(false)));
+        timeline1.play();
+
+        enemyHPProgress.setProgress(enemyHPProgress.getProgress() - .1);
+        System.out.println("Punch");
+
+
         System.out.println("Ki Blast");
     }
 
-    public void kickOnAction(ActionEvent actionEvent) { //kick button when clicked
-        System.out.println("Kick");
+    public void kickOnAction(ActionEvent actionEvent) throws IOException {
+
+        //punch button when clicked
+        checkGameOver();
+        Naruto.setVisible(true);
+        gokustanding.setVisible(false);
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.seconds(2),
+                ae -> gokustanding.setVisible(true)));
+        timeline.play();
+
+
+        Timeline timeline1 = new Timeline(new KeyFrame(
+                Duration.seconds(2),
+                ae ->  Naruto.setVisible(false)));
+        timeline1.play();
+
+        enemyHPProgress.setProgress(enemyHPProgress.getProgress() - .1);
+
+
+        System.out.println("Ki Blast");
     }
 
     public void sendOnAction(ActionEvent actionEvent) throws IOException { //send button when clicked
-        sendMessage(); //calls send message function
+        //sendMessage(); //calls send message function
     }
 
     public void onSendEnter(KeyEvent keyEvent) throws IOException { //when you hit enter while in message field
         if (keyEvent.getCode().toString().equals("ENTER")){
-            sendMessage(); //calls send message function
+            //sendMessage(); //calls send message function
         }
     }
 
+    public void backToMainMenu(ActionEvent actionEvent) {
+        mainStage.setScene(menuScene);
+    }
+
+    public void picKiblastOnAaction(ActionEvent actionEvent) throws IOException {
+        checkGameOver();
+        pickiblast();
+    }
+
+    public void pickiblast(){
+        picoloKiblast.setVisible(true);
+        picoloStanding.setVisible(false);
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.seconds(1.64),
+                ae -> picoloStanding.setVisible(true)));
+        timeline.play();
 
 
+        Timeline timeline1 = new Timeline(new KeyFrame(
+                Duration.seconds(1.64),
+                ae -> picoloKiblast.setVisible(false)));
+        timeline1.play();
+
+        playerHPProgress.setProgress(playerHPProgress.getProgress() - .1);
+        System.out.println("Picolo KiBlast");
+    }
+
+    public void picPunchOnAction(ActionEvent actionEvent) {
+    }
+
+    public void picKickOnAction(ActionEvent actionEvent) {
+    }
+
+    public void checkGameOver() throws IOException{
+        if (playerHPProgress.getProgress() <= 0 || enemyHPProgress.getProgress() <= 0) {
+            System.out.println("Game Over");
+            playerHPProgress.setProgress(1);
+            enemyHPProgress.setProgress(1);
+            BufferedWriter bw = new BufferedWriter(new FileWriter(gameLengths, true));
+            bw.append("Number of turns taken: " + turnCounter);
+            bw.newLine();
+            bw.flush();
+            bw.close();
+            turnCounter = 0;
+            mainStage.setScene(globalGameOverScene);
+        }
+        turnCounter++;
+    }
+
+//TEHSEENS SERVER CODE, DO NOT USE
+    /*
     public void client() throws IOException {
         if (send = Boolean.TRUE) {
-            Socket socket = new Socket("192.168.1.172", 8195);
+            Socket socket = new Socket("192.168.1.146", 8090);
             PrintWriter out = new PrintWriter(socket.getOutputStream());
             String request = temp;
-            out.print(temp);
+            out.print(request);
             out.flush();
-            System.out.println("hello");
-            socket.close();
             txtChatBox.setWrapText(true); //wraps to next line if message is too long
             txtChatBox.appendText(request + "\n"); //appends the message with a next line at the end of it
         }
     }
 
-    /*public void Server() throws IOException {
-        ServerSocket serverSocket = new ServerSocket(8095);
+    public void Server() throws IOException {
         while (true) {
             try {
+                ServerSocket serverSocket = new ServerSocket(8195);
                 Socket clientSocket = serverSocket.accept();
 
                 InputStream inStream = clientSocket.getInputStream();
@@ -305,22 +476,18 @@ public class Main extends Application {
                     System.out.println(line);
                 }
 
-            } catch (IOException e) {
+            } catch (IOException e1) {
                 System.out.println("Client Disconnected");
-                e.printStackTrace();
+                e1.printStackTrace();
+
 
             }
             //... input and output goes here ...
         }
-    }*/
-
-
-    public void sendMessage() throws IOException {
-        temp = txtTypeMsg.getText(); //temp is the whatever is in the text field
-        txtTypeMsg.clear(); //clears message when it has been put into temp
-        send = Boolean.TRUE;
-        //client();
     }
+*/
+
+
 
     private static class MenuBox extends VBox {
         public MenuBox(MenuItem... items) {
@@ -360,7 +527,3 @@ public class Main extends Application {
         }
     }
 }
-
-/*works cited
-https://wallhere.com/en/wallpaper/606728
-*/
