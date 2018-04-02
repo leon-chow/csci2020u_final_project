@@ -16,9 +16,9 @@ import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
@@ -48,10 +48,9 @@ import java.io.File;
 import java.sql.Time;
 
 
-public class Main extends Application {
+public class Main extends Application{
     Boolean send;
     public static Stage mainStage;
-    String temp;
 
     public static int turnCounter = 0;
 
@@ -60,6 +59,8 @@ public class Main extends Application {
 
     public static Scene optionsScene = new Scene(optionsMenu);
     public static Scene menuScene = new Scene(mainMenu);
+
+    String temp;
 
     public static Parent parentFightScene;
     public static Parent parentVolumeScene;
@@ -74,45 +75,44 @@ public class Main extends Application {
     File creditsFile = new File("src/sample/Credits.txt");
     File gameLengths = new File("src/sample/GameLengths.txt");
 
-    @FXML Button btnGoBack = new Button();
-    @FXML public Slider volumeSlider;
-    @FXML public Slider brightnessSlider;
-
     @FXML
-    ImageView picoloStanding = new ImageView();
+    ImageView gokustanding = new ImageView();
     @FXML
     ImageView picoloKiblast = new ImageView();
     @FXML
-    javafx.scene.control.TextField txtTypeMsg = new TextField(); //using the ID of of the messaging field
-    @FXML
-    TextArea txtChatBox = new TextArea(); //using the ID of the chatbox field
-    @FXML
-    ImageView gokustanding = new ImageView();
+    ImageView picoloStanding = new ImageView();
     @FXML
     ImageView gokuattack = new ImageView();
     @FXML
     ImageView gokukiblast = new ImageView();
     @FXML
     ImageView Naruto = new ImageView();
+    @FXML
+    Button btnPicKiblast = new Button();
+    @FXML
+    Button btnPicPunch = new Button();
+    @FXML
+    Button btnPicKick = new Button();
+    @FXML
+    Button btnKick = new Button();
+    @FXML
+    Button btnPunch = new Button();
+    @FXML
+    Button btnKiblast = new Button();
+
     final Float playerHPValue = 1.0f;
     final Float enemyHPValue = 1.0f;
 
     @FXML
     ProgressBar playerHPProgress = new ProgressBar(playerHPValue);
     @FXML ProgressBar enemyHPProgress = new ProgressBar(enemyHPValue);
-
-    @FXML Button btnPunch = new Button();
-    @FXML Button btnPicPunch = new Button();
-
-    @FXML Button btnKick = new Button();
-    @FXML Button btnPicKick = new Button();
-
-    @FXML Button btnKiblast = new Button();
-    @FXML Button btnPicKiblast = new Button();
+    @FXML Button btnGoBack = new Button();
+    @FXML public Slider volumeSlider;
+    @FXML public Slider brightnessSlider;
 
     @FXML
     private TextArea txtRules;
-    private static MediaPlayer mp;
+    private MediaPlayer mp;
     private MediaView mv;
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -129,12 +129,11 @@ public class Main extends Application {
         parentVolumeScene = volume;
         parentGameOver = gameOver;
 
-        //loaded file in txtRules
         txtRules = new TextArea();
         txtRules.setStyle("-fx-control-inner-background:blue; -fx-opacity: transparent");
-        txtRules.setPrefSize(300,300);
         txtRules.setDisable(true);
         primaryStage.setResizable(false); //doesn't let you resize window
+
 
         mainMenu.setPrefSize(603, 400);
         optionsMenu.setPrefSize(603, 400);
@@ -202,7 +201,6 @@ public class Main extends Application {
         optionsMenu.getChildren().addAll(optionsBox, goBack);
 
 
-
         Exit.setOnMouseClicked(e -> {
             System.exit(0);
         });
@@ -221,10 +219,7 @@ public class Main extends Application {
             primaryStage.setScene(playScene);
 
             Thread th = new Thread(() -> {
-                /*src.sample.Client charlie;
-                charlie = new src.sample.Client("127.0.0.1");
-                charlie.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                charlie.startRunning(); */
+
                 Server test = new Server();
                 test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 test.startRunning();
@@ -232,7 +227,23 @@ public class Main extends Application {
             });
             th.setDaemon(true);
             th.start();
+
+
+            Thread ts = new Thread(() -> {
+                Client charlie;
+                charlie = new Client("192.168.0.32");
+                charlie.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                charlie.startRunning();
+            });
+            ts.setDaemon(true);
+
+            Timeline timeline1 = new Timeline(new KeyFrame(
+                    Duration.seconds(15.00),
+                    ae ->  ts.start()));
+            timeline1.play();
             mp.setVolume(0.05);
+
+
         });
 
 
@@ -287,6 +298,7 @@ public class Main extends Application {
             }
         });
 
+
         Volume.setOnMouseClicked(e -> {
             txtRules.setVisible(false);
             primaryStage.setScene(volumeScene);
@@ -299,11 +311,8 @@ public class Main extends Application {
 
     public void sliderDragDetected (MouseEvent mouseEvent) {
         volumeSlider.setValue(mp.getVolume() * 100);
-        volumeSlider.valueProperty().addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                mp.setVolume(volumeSlider.getValue() / 100);
-            }
+        volumeSlider.valueProperty().addListener(observable -> {
+            mp.setVolume(volumeSlider.getValue() / 100);
         });
     }
 
@@ -321,9 +330,38 @@ public class Main extends Application {
         mainStage.setScene(optionsScene);
     }
 
-    public void punchOnAction(ActionEvent actionEvent) throws IOException {
+    public void backToMainMenu(ActionEvent actionEvent) {
+        mainStage.setScene(menuScene);
+    }
+
+    public void setGokuTurn() throws IOException {
         checkGameOver();
+        btnPicKiblast.setDisable(true);
+        btnPicKick.setDisable(true);
+        btnPicPunch.setDisable(true);
+        btnKiblast.setDisable(false);
+        btnKick.setDisable(false);
+        btnPunch.setDisable(false);
+    }
+
+    public void setPicoloTurn() throws IOException {
+        checkGameOver();
+        btnPicKiblast.setDisable(false);
+        btnPicKick.setDisable(false);
+        btnPicPunch.setDisable(false);
+        btnKiblast.setDisable(true);
+        btnKick.setDisable(true);
+        btnPunch.setDisable(true);
+    }
+
+
+    public void punchOnAction(ActionEvent actionEvent) throws IOException {
         //punch button when clicked
+        punch();
+        setPicoloTurn();
+    }
+
+    public void punch(){
         gokuattack.setVisible(true);
         gokustanding.setVisible(false);
         Timeline timeline = new Timeline(new KeyFrame(
@@ -342,8 +380,12 @@ public class Main extends Application {
     }
 
     public void kiblastOnAction(ActionEvent actionEvent) throws IOException {
-        checkGameOver();
         //punch button when clicked
+        kiblast();
+        setPicoloTurn();
+    }
+
+    public void kiblast(){
         gokukiblast.setVisible(true);
         gokustanding.setVisible(false);
         Timeline timeline = new Timeline(new KeyFrame(
@@ -358,23 +400,25 @@ public class Main extends Application {
         timeline1.play();
 
         enemyHPProgress.setProgress(enemyHPProgress.getProgress() - .1);
-        System.out.println("Punch");
 
 
         System.out.println("Ki Blast");
     }
 
-    public void kickOnAction(ActionEvent actionEvent) throws IOException {
 
+    public void kickOnAction(ActionEvent actionEvent) throws IOException {
         //punch button when clicked
-        checkGameOver();
+        kick();
+        setPicoloTurn();
+    }
+
+    public void kick(){
         Naruto.setVisible(true);
         gokustanding.setVisible(false);
         Timeline timeline = new Timeline(new KeyFrame(
                 Duration.seconds(2),
                 ae -> gokustanding.setVisible(true)));
         timeline.play();
-
 
         Timeline timeline1 = new Timeline(new KeyFrame(
                 Duration.seconds(2),
@@ -397,13 +441,9 @@ public class Main extends Application {
         }
     }
 
-    public void backToMainMenu(ActionEvent actionEvent) {
-        mainStage.setScene(menuScene);
-    }
-
     public void picKiblastOnAaction(ActionEvent actionEvent) throws IOException {
-        checkGameOver();
         pickiblast();
+        setGokuTurn();
     }
 
     public void pickiblast(){
@@ -424,10 +464,12 @@ public class Main extends Application {
         System.out.println("Picolo KiBlast");
     }
 
-    public void picPunchOnAction(ActionEvent actionEvent) {
+    public void picPunchOnAction(ActionEvent actionEvent) throws IOException {
+        setGokuTurn();
     }
 
-    public void picKickOnAction(ActionEvent actionEvent) {
+    public void picKickOnAction(ActionEvent actionEvent) throws IOException {
+        setGokuTurn();
     }
 
     public void checkGameOver() throws IOException{
@@ -445,7 +487,6 @@ public class Main extends Application {
         }
         turnCounter++;
     }
-
 //TEHSEENS SERVER CODE, DO NOT USE
     /*
     public void client() throws IOException {
@@ -486,7 +527,6 @@ public class Main extends Application {
         }
     }
 */
-
 
 
     private static class MenuBox extends VBox {
