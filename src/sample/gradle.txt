@@ -1,0 +1,20 @@
+apply plugin: "java"
+
+sourceSets{
+    main.java.srcDir "src/sample"
+}
+
+jar{
+    manifest.attributes "Main-Class": "sample.Main"
+}
+
+task copyTask(type: Copy) {
+    from 'src/sample/Fight.fxml'
+    into 'build/classes/java/main/sample'
+
+
+    from 'src/sample/music.mp3'
+    into 'build/classes/java/main/sample'
+
+
+}
