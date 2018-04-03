@@ -1,4 +1,4 @@
-
+//Leon Chow 100617197 Samatar Mumin 100637553 Tehseen Chaudhry 100618539 Bevan Donbosco 100618701
 
 package src.sample;
 import java.io.*;
@@ -8,16 +8,17 @@ import java.awt.event.*;
 import javax.swing.*;
 
 
-
+//class to handle client connection for chat
 public class Client extends JFrame {
     private JTextField userText;
-    private  JTextArea chatWindow;
+    private JTextArea chatWindow;
     private ObjectOutputStream output;
-    private  ObjectInputStream input;
+    private ObjectInputStream input;
     private String message = "";
-    private  String ServerIP;
+    private String ServerIP;
     public Socket connection;
 
+    //client constructor to send messages and handle chat
     public Client(String host){
         super("client");
         ServerIP= host;
@@ -39,18 +40,18 @@ public class Client extends JFrame {
 
     }
 
-    //connecting to server
+    //connects to the server
     public void startRunning(){
         try{
             connectToServer();
             setupStream();
             whileChatting();
-        }catch(EOFException eofException){
+        } catch(EOFException eofException){
             showMessage("\n cilent ended session");
-        }catch(IOException ioException){
+        } catch(IOException ioException){
             ioException.printStackTrace();
-        }finally {
-            closeCrap();
+        } finally {
+            closeStream();
         }
     }
     //connecting server
@@ -58,17 +59,16 @@ public class Client extends JFrame {
         showMessage("Attempting connection \n");
         connection = new Socket(InetAddress.getByName(ServerIP),6789);
         showMessage("Connected to "+connection.getInetAddress().getHostName());
-
     }
 
-    //setup streams to get msgs
+    //opens the stream to get input
     private void setupStream()throws IOException{
         output = new ObjectOutputStream(connection.getOutputStream());
         output.flush();
         input = new ObjectInputStream(connection.getInputStream());
         showMessage("\n you are set up \n");
     }
-    //while chatting
+    //while both the users are chatting
     private void whileChatting()throws IOException{
         ableToType(true);
         do{
@@ -81,8 +81,8 @@ public class Client extends JFrame {
 
         }while(!message.equals("SERVER - END"));
     }
-    //close sockets and stream
-    private void closeCrap(){
+    //close the sockets and the stream
+    private void closeStream(){
         showMessage("\n closes stream/sockets");
         ableToType(false);
         try{
@@ -93,7 +93,7 @@ public class Client extends JFrame {
             ioException.printStackTrace();
         }
     }
-    //send messages server
+    //sends the messages to the server
     private void sendMessage(String message){
         try{
             output.writeObject("Cilent -"+message);
@@ -104,7 +104,7 @@ public class Client extends JFrame {
         }
     }
 
-    //changing chat window
+    //updating the chat window to show messages
     private void showMessage(final String m){
         SwingUtilities.invokeLater(
 
@@ -116,7 +116,7 @@ public class Client extends JFrame {
         );
     }
 
-    //abletoptype
+    //allows the user to type
     private  void ableToType(final boolean tof){
         SwingUtilities.invokeLater(
 

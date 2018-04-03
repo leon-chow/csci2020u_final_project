@@ -1,3 +1,7 @@
+//Leon Chow 100617197 Samatar Mumin 100637553 Tehseen Chaudhry 100618539 Bevan Donbosco 100618701
+//This program opens a game menu where the user can play the game. The user can learn how to play by
+//opening up the options menu. They can change the volume and the brightness of the game too.
+//When either player 1 or player 2 reaches 0 HP, the game ends and the user exits the client
 package src.sample;
 
 import java.awt.*;
@@ -48,8 +52,9 @@ import javax.swing.*;
 import java.io.File;
 import java.sql.Time;
 
-
+//main function
 public class Main extends Application{
+    //variables and scenes to be used in the program
     Boolean send;
     public static Stage mainStage;
 
@@ -74,10 +79,12 @@ public class Main extends Application{
     public static ColorAdjust colorAdjust = new ColorAdjust();
 
     public static BufferedReader br;
+    //files to be read through input
     File helpFile = new File("src/sample/Instructions.txt");
     File creditsFile = new File("src/sample/Credits.txt");
     File gameLengths = new File("src/sample/GameLengths.txt");
 
+    //images and gifs to be loaded in the scenes
     @FXML
     ImageView SpecialBeam = new ImageView();
     @FXML
@@ -110,6 +117,7 @@ public class Main extends Application{
     public Float playerHPValue = 1.0f;
     public Float enemyHPValue = 1.0f;
 
+    //health bars and volume/brightness slider in the options menu
     @FXML
     ProgressBar playerHPProgress = new ProgressBar(playerHPValue);
     @FXML ProgressBar enemyHPProgress = new ProgressBar(enemyHPValue);
@@ -119,38 +127,48 @@ public class Main extends Application{
 
     @FXML
     private TextArea txtRules;
-    private MediaPlayer mp;
+    private static MediaPlayer mp;
     private MediaView mv;
     @Override
     public void start(Stage primaryStage) throws Exception {
+        //making the primary stage global
         mainStage = primaryStage;
+
+        //loading in the stages to be used later
         FXMLLoader loader = new FXMLLoader(getClass().getResource("fight.fxml"));
         FXMLLoader volumeLoader = new FXMLLoader(getClass().getResource("Volume.fxml"));
         FXMLLoader gameOverLoader = new FXMLLoader(getClass().getResource("GameOver.fxml"));
 
+        //casting the loaders to be parents
         Parent root = (Parent)loader.load();
         Parent volume = (Parent)volumeLoader.load();
         Parent gameOver = (Parent)gameOverLoader.load();
 
+        //making the loaders static global
         parentFightScene = root;
         parentVolumeScene = volume;
         parentGameOver = gameOver;
 
+        //creating a textbox to be used to file read and show how to play and credits
         txtRules = new TextArea();
         txtRules.setStyle("-fx-control-inner-background:blue; -fx-opacity: transparent");
+        txtRules.setPrefSize(300,300);
         txtRules.setDisable(true);
         primaryStage.setResizable(false); //doesn't let you resize window
 
-
+        //changing size of window
         mainMenu.setPrefSize(603, 400);
         optionsMenu.setPrefSize(603, 400);
 
+        //creating scenes to be used later
         Scene playScene = new Scene(root, 603, 400);
         Scene volumeScene = new Scene(volume, 603, 400);
         Scene gameOverScene = new Scene(gameOver, 603, 400);
 
+        //set gameoverscene to global
         globalGameOverScene = gameOverScene;
 
+        //loading in the music file that is played throughout the whole program
         try {
             Media audo = new Media(getClass().getResource("music.mp3").toURI().toString());
             mp = new MediaPlayer(audo);
@@ -164,6 +182,7 @@ public class Main extends Application{
             e.printStackTrace();
         }
 
+        //loading in the background for the main menu
         try (InputStream is = Files.newInputStream(Paths.get("res/dbz.jpg"))) {
             ImageView img = new ImageView(new Image(is));
             img.setFitWidth(603);
@@ -172,7 +191,7 @@ public class Main extends Application{
             is.close();
         }
 
-
+        //loading in the background for options menu
         try (InputStream os = Files.newInputStream(Paths.get("res/lol.jpg"))) {
             ImageView img1 = new ImageView(new Image(os));
             img1.setFitWidth(603);
@@ -183,6 +202,7 @@ public class Main extends Application{
             System.out.println("Failed");
         }
 
+        //creating main menu and buttons
         MenuItem Play = new MenuItem("Play");
         MenuItem Options = new MenuItem("Options");
         MenuItem Exit = new MenuItem("Exit");
@@ -196,6 +216,7 @@ public class Main extends Application{
         MenuBox optionsBox = new MenuBox(Help, Volume, Credits);
         MenuBox volumeBox = new MenuBox(goBack);
 
+        //setting coordinates for items to be placed
         menuBox.setTranslateX(350);
         menuBox.setTranslateY(200);
         optionsBox.setTranslateX(350);
@@ -204,10 +225,12 @@ public class Main extends Application{
         goBack.setTranslateY(10);
 
 
+        //adds the items to the menus
         mainMenu.getChildren().addAll(menuBox);
         optionsMenu.getChildren().addAll(optionsBox, goBack);
 
 
+        //event handlers with lambda functions when buttons are clicked
         Exit.setOnMouseClicked(e -> {
             System.exit(0);
         });
@@ -223,8 +246,10 @@ public class Main extends Application{
 
         Play.setOnMouseClicked(e -> {
 
+            //changes scene of primary stage to play
             primaryStage.setScene(playScene);
 
+            //creates thread for server
             Thread th = new Thread(() -> {
                 Server test = new Server();
                 test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -234,15 +259,17 @@ public class Main extends Application{
             th.setDaemon(true);
             th.start();
 
+            //creates thread for client
             Thread ts = new Thread(() -> {
-                Client charlie;
-                charlie = new Client("10.190.39.176");
-                charlie.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                charlie.startRunning();
+                Client client;
+                client = new Client("10.190.39.176");
+                client.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                client.startRunning();
             });
 
             ts.setDaemon(true);
 
+            //sets delay for the volume
             Timeline timeline1 = new Timeline(new KeyFrame(
                     Duration.seconds(12.00),
                     ae ->  ts.start()));
@@ -253,12 +280,14 @@ public class Main extends Application{
         });
 
 
+        //function to output txt file with the rules
         Help.setOnMouseClicked((MouseEvent e) -> {
             try {
                 txtRules.clear();
                 txtRules.setWrapText(true);
                 br = new BufferedReader(new FileReader(helpFile));
                 String next = null;
+                //if the file is still reading
                 if (txtRules.getLength() <= 0) {
                     txtRules.appendText("How to play: \n \n");
                     while ((next = br.readLine()) != null) {
@@ -266,6 +295,7 @@ public class Main extends Application{
                     }
                 }
 
+                //shows box when user clicks on help
                 txtRules.setVisible(true);
                 optionsMenu.getChildren().add(txtRules);
 
@@ -279,6 +309,7 @@ public class Main extends Application{
             }
         });
 
+        //function to read the credits from the text file
         Credits.setOnMouseClicked(e -> {
             try {
                 txtRules.clear();
@@ -304,24 +335,29 @@ public class Main extends Application{
             }
         });
 
-
+        //sets the volume stage, hides text area
         Volume.setOnMouseClicked(e -> {
             txtRules.setVisible(false);
             primaryStage.setScene(volumeScene);
         });
 
-        primaryStage.setTitle("DragonBall Ghetto");
+        primaryStage.setTitle("DragonBall");
         primaryStage.setScene(menuScene);
         primaryStage.show();
     }
 
+    //function to adjust the volume when the slider is moved
     public void sliderDragDetected (MouseEvent mouseEvent) {
         volumeSlider.setValue(mp.getVolume() * 100);
-        volumeSlider.valueProperty().addListener(observable -> {
-            mp.setVolume(volumeSlider.getValue() / 100);
+        volumeSlider.valueProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                mp.setVolume(volumeSlider.getValue() / 100);
+            }
         });
     }
 
+    //function to adjust the brightness of all scenes when the slider is moved
     public void brightnessMouseDrag (MouseEvent mouseEvent) {
         double brightness = brightnessSlider.getValue();
         colorAdjust.setBrightness(brightness);
@@ -331,15 +367,17 @@ public class Main extends Application{
         optionsMenu.setEffect(colorAdjust);
     }
 
+    //function to return to options menu
     public void backOnAction(ActionEvent actionEvent) {
-        System.out.println("Testing...");
         mainStage.setScene(optionsScene);
     }
 
+    //function that exits the program
     public void backToMainMenu(ActionEvent actionEvent) {
         System.exit(0);
     }
 
+    //function to enable the goku's buttons in the play stage when it is goku's turn
     public void setGokuTurn() throws IOException {
 
         btnPicKiblast.setDisable(true);
@@ -350,6 +388,7 @@ public class Main extends Application{
         btnPunch.setDisable(false);
     }
 
+    //function to enable piccolo's buttons when it is piccolo's turn
     public void setPicoloTurn() throws IOException {
 
         btnPicKiblast.setDisable(false);
@@ -360,6 +399,7 @@ public class Main extends Application{
         btnPunch.setDisable(true);
     }
 
+    //function to disable all buttons
     public void allDisable(){
         btnKiblast.setDisable(true);
         btnKick.setDisable(true);
@@ -369,6 +409,7 @@ public class Main extends Application{
         btnPicPunch.setDisable(true);
     }
 
+    //function to create a generate a random number
     public float getRandom(){
         Random rand = new Random();
         float result = rand.nextFloat() * (0.5f - 0.0f) + 0.0f;
@@ -377,12 +418,14 @@ public class Main extends Application{
     }
 
 
+    //function to call punch method to process health bars and damage
     public void punchOnAction(ActionEvent actionEvent) throws IOException {
         //punch button when clicked
         setPicoloTurn();
         punch();
     }
 
+    //function called by punchOnaction, which sets and hides animations and updates health bars
     public void punch() throws IOException {
         gokuattack.setVisible(true);
         gokustanding.setVisible(false);
@@ -404,12 +447,13 @@ public class Main extends Application{
         checkGameOver();
     }
 
+    //function that calls kiblast function and sets piccolo's turn to true
     public void kiblastOnAction(ActionEvent actionEvent) throws IOException {
-        //punch button when clicked
         setPicoloTurn();
         kiblast();
     }
 
+    //function called by kiblastOnAction, which sets and hides animations and updates health bars
     public void kiblast() throws IOException {
         gokukiblast.setVisible(true);
         gokustanding.setVisible(false);
@@ -418,7 +462,7 @@ public class Main extends Application{
                 ae -> gokustanding.setVisible(true)));
         timeline.play();
 
-
+        //sets the delay for the animation
         Timeline timeline1 = new Timeline(new KeyFrame(
                 Duration.seconds(1.00),
                 ae ->  gokukiblast.setVisible(false)));
@@ -434,12 +478,14 @@ public class Main extends Application{
     }
 
 
+    //function to call kick function and set piccolo's turn to true
     public void kickOnAction(ActionEvent actionEvent) throws IOException {
         //punch button when clicked
         setPicoloTurn();
         kick();
     }
 
+    //function called by kickOnAction, which sets and hides animations and updates health bars
     public void kick() throws IOException {
         Naruto.setVisible(true);
         gokustanding.setVisible(false);
@@ -471,11 +517,13 @@ public class Main extends Application{
         }
     }
 
+    //function to call pickiblast and sets goku's turn to true
     public void picKiblastOnAaction(ActionEvent actionEvent) throws IOException {
         setGokuTurn();
         pickiblast();
     }
 
+    //function called by pickiblast, which sets and hides animations and updates health bars
     public void pickiblast() throws IOException {
         picoloKiblast.setVisible(true);
         picoloStanding.setVisible(false);
@@ -497,11 +545,13 @@ public class Main extends Application{
         checkGameOver();
     }
 
+    //function to call picPunch and sets goku's turn to true
     public void picPunchOnAction(ActionEvent actionEvent) throws IOException {
         setGokuTurn();
         picPunch();
     }
 
+    //function called by picPunch, which sets and hides animations and updates health bars
     public void picPunch() throws IOException {
         SpecialBeam.setVisible(true);
         picoloStanding.setVisible(false);
@@ -523,11 +573,13 @@ public class Main extends Application{
         checkGameOver();
     }
 
+    //function to call picKick and set Goku's turn to true
     public void picKickOnAction(ActionEvent actionEvent) throws IOException {
         setGokuTurn();
         picKick();
     }
 
+    //function called by picKick, which sets and hides animations and updates health bars
     public void picKick() throws IOException {
         picKick.setVisible(true);
         picoloStanding.setVisible(false);
@@ -549,6 +601,7 @@ public class Main extends Application{
         checkGameOver();
     }
 
+    //checks to see if the game is over, which will output to the file how many turns it took for the battle, and sets stage to game over
     public void checkGameOver() throws IOException{
         if (playerHPValue <= 0 || enemyHPValue <= 0) {
             allDisable();
@@ -566,48 +619,8 @@ public class Main extends Application{
         }
         turnCounter++;
     }
-//TEHSEENS SERVER CODE, DO NOT USE
-    /*
-    public void client() throws IOException {
-        if (send = Boolean.TRUE) {
-            Socket socket = new Socket("192.168.1.146", 8090);
-            PrintWriter out = new PrintWriter(socket.getOutputStream());
-            String request = temp;
-            out.print(request);
-            out.flush();
-            txtChatBox.setWrapText(true); //wraps to next line if message is too long
-            txtChatBox.appendText(request + "\n"); //appends the message with a next line at the end of it
-        }
-    }
 
-    public void Server() throws IOException {
-        while (true) {
-            try {
-                ServerSocket serverSocket = new ServerSocket(8195);
-                Socket clientSocket = serverSocket.accept();
-
-                InputStream inStream = clientSocket.getInputStream();
-                InputStreamReader reader = new InputStreamReader(inStream);
-                BufferedReader in = new BufferedReader(reader);
-
-                String line = null;
-                while ((line = in.readLine()) != null) {
-                    // do something with 'line'
-                    System.out.println(line);
-                }
-
-            } catch (IOException e1) {
-                System.out.println("Client Disconnected");
-                e1.printStackTrace();
-
-
-            }
-            //... input and output goes here ...
-        }
-    }
-*/
-
-
+    //function that appends the menu items to the box with seperators
     private static class MenuBox extends VBox {
         public MenuBox(MenuItem... items) {
             getChildren().add(createSeparator());
@@ -616,6 +629,7 @@ public class Main extends Application{
             }
         }
 
+        //function that creates menu seperators
         private Line createSeparator() {
             Line sep = new Line();
             sep.setEndX(235);
@@ -624,6 +638,7 @@ public class Main extends Application{
         }
     }
 
+    //function that creates menu items and styles them up
     private static class MenuItem extends StackPane {
         public MenuItem(String name) {
 

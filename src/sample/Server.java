@@ -1,3 +1,4 @@
+//Leon Chow 100617197 Samatar Mumin 100637553 Tehseen Chaudhry 100618539 Bevan Donbosco 100618701
 package src.sample;
 import java.io.*;
 import java.net.*;
@@ -5,17 +6,20 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
+//class that handles the server connection with the client and enables chatting between both
 public class Server extends JFrame {
 
-
+    //variables used later
     private TextField userText;
-    private  TextArea chatwindow;
-    private ObjectOutputStream output;
-    private ObjectInputStream input;
-    private ServerSocket server;
-    private Socket connection;
+    private TextArea chat;
+    private ObjectOutputStream outputStream;
+    private ObjectInputStream inputStream;
+    private ServerSocket serverSocket;
+    private Socket connectionSocket;
+
+    //server constructor, handles messenger
     public Server(){
-        super("instant messanger");
+        super("Dragon Ball Messenger");
         userText = new TextField();
         userText.setEditable(false);
         userText.addActionListener(
@@ -27,16 +31,16 @@ public class Server extends JFrame {
                 }
         );
         add(userText,BorderLayout.NORTH);
-        chatwindow = new TextArea();
-        add(new JScrollPane(chatwindow));
+        chat = new TextArea();
+        add(new JScrollPane(chat));
         setSize(300,150);
         setVisible(true);
 
     }
-    //server
+    //handles the serer connection
     public void startRunning(){
         try{
-            server = new ServerSocket(6789,100);
+            serverSocket = new ServerSocket(6789,100);
             while(true) {
                 try {
                     WaitForConnection();
@@ -48,36 +52,33 @@ public class Server extends JFrame {
                     closeStream();
                 }
             }
-    }catch(IOException ioException){
+    } catch (IOException ioException){
         ioException.printStackTrace();
         }
-
-        //wait for connection, then display connection
-
-
     }
 
+    //awaiting for connection from the client
     private void WaitForConnection() throws IOException {
-        showMessage("waiting for other conneection");
-        connection = server.accept();
-        showMessage("now connected to"+ connection.getInetAddress().getHostName());
+        showMessage("waiting for other connection");
+        connectionSocket = serverSocket.accept();
+        showMessage("now connected to"+ connectionSocket.getInetAddress().getHostName());
     }
+    //sets up streams for input and output
     private void setupStreams() throws IOException{
-        output= new ObjectOutputStream(connection.getOutputStream());
-        output.flush();
-        input = new ObjectInputStream(connection.getInputStream());
+        outputStream= new ObjectOutputStream(connectionSocket.getOutputStream());
+        outputStream.flush();
+        inputStream = new ObjectInputStream(connectionSocket.getInputStream());
         showMessage("stream setup");
     }
 
-    //while chatting
-
+    //while the client and servers are open and connected
     private void whileChatting()throws IOException{
         String message = " successfully connected";
         sendMessage(message);
         ableToType(true);
         do{
             try {
-                message = (String) input.readObject();
+                message = (String) inputStream.readObject();
                 showMessage("\n" +  message);
             }catch(ClassNotFoundException classNotFoundException){
                 showMessage("\n user sending error");
@@ -86,44 +87,43 @@ public class Server extends JFrame {
         }while(!message.equals("CILENT - END"));
     }
 
-    //clean up after chatting close stream/sockets
+    //closes streams after the connections are ended
     private void closeStream(){
         showMessage("\n closing connection \n");
         ableToType(false);
         try {
-            output.close();
-            input.close();
-            connection.close();
+            outputStream.close();
+            inputStream.close();
+            connectionSocket.close();
         }catch(IOException ioException){
             ioException.printStackTrace();
         }
-
-        //send info to client
     }
 
+    //handles messages between client and user
     private void sendMessage(String message){
         try{
-            output.writeObject("Username -" + message);
-            output.flush();
+            outputStream.writeObject("Username -" + message);
+            outputStream.flush();
             showMessage("\n Username - " + message);
         }catch(IOException ioException){
-            chatwindow.append(" \n error, cant send message");
+            chat.append(" \n error, cant send message");
         }
 
     }
 
-    //updates chat
+    //updates the chat for both user and client
     private void showMessage(final String text){
         SwingUtilities.invokeLater(
                 new Runnable(){
                     public void run(){
-                        chatwindow.append(text);
+                        chat.append(text);
                     }
                 }
         );
     }
-    // letting the other player type
 
+    //allowing users to type
     private void ableToType(final boolean tof){
         SwingUtilities.invokeLater(
                 new Runnable(){
